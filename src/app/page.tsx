@@ -8,7 +8,6 @@ import Keyboard from '@/components/3d/Keyboard';
 export default function Home() {
   const router = useRouter();
   const keyboardRef = useRef<HTMLDivElement>(null);
-  const [isFlashing, setIsFlashing] = useState(false);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -23,14 +22,9 @@ export default function Home() {
     if (prefersReducedMotion) {
       router.push('/studio#work');
     } else {
-      // 900ms total transition: dolly camera for 700ms, then flash
-      setTimeout(() => {
-        setIsFlashing(true);
-      }, 700);
-
       setTimeout(() => {
         router.push('/studio#work');
-      }, 900);
+      }, 700);
     }
   }, [isTransitioning, router]);
 
@@ -55,9 +49,13 @@ export default function Home() {
       onTouchStart={triggerTransition}
       onWheel={triggerTransition}
     >
-      {isFlashing && <div className="flash-overlay"></div>}
-
-      <div className="hero-content">
+      <div 
+        className="hero-content" 
+        style={{ 
+          transition: 'opacity 0.7s ease', 
+          opacity: isTransitioning ? 0 : 1 
+        }}
+      >
         <div className="hero-kicker">[BRAND NAME] — WEB DESIGN STUDIO, MUMBAI</div>
         <h1 className="hero-title">
           <span className="muted-line" style={{ color: '#9CA3AF' }}>Most websites take months and cost lakhs.</span>
@@ -70,14 +68,28 @@ export default function Home() {
       </div>
 
       <div className="keyboard-zone">
-        <div className="keyboard-container" ref={keyboardRef}>
+        <div 
+          className="keyboard-container" 
+          ref={keyboardRef}
+          style={{ 
+            transition: 'opacity 0.7s ease, transform 0.7s ease', 
+            opacity: isTransitioning ? 0 : 1,
+            transform: isTransitioning ? 'scale(0.9) translateY(40px)' : 'scale(1) translateY(0)'
+          }}
+        >
           <View className="keyboard-view" style={{ width: '100%', height: '100%' }}>
             <Keyboard isSpacePressed={isSpacePressed} transitioning={isTransitioning} />
           </View>
         </div>
       </div>
 
-      <div className="cta-prompt-container">
+      <div 
+        className="cta-prompt-container"
+        style={{ 
+          transition: 'opacity 0.7s ease', 
+          opacity: isTransitioning ? 0 : 1 
+        }}
+      >
         <div className="cta-prompt">
           <span className="prompt-text desktop-only">press <span className={`spacebar-key ${isSpacePressed ? 'pressed' : ''}`}>[ SPACE ]</span> to see our work</span>
           <span className="prompt-text mobile-only">tap the spacebar</span>

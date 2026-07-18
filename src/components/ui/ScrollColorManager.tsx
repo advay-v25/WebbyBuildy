@@ -4,10 +4,10 @@ import { useEffect } from 'react';
 
 // Define the color stops for each section
 const colorStops = [
-  { id: 'work', bg: [10, 10, 10], text: [255, 255, 255] },        // #0A0A0A
-  { id: 'about', bg: [138, 138, 138], text: [10, 10, 10] },      // #8A8A8A
-  { id: 'feedback', bg: [229, 229, 229], text: [10, 10, 10] },   // #E5E5E5
-  { id: 'book', bg: [247, 245, 242], text: [10, 10, 10] },       // #F7F5F2
+  { id: 'work', bg: [10, 10, 10] },         // #0A0A0A
+  { id: 'about', bg: [214, 211, 206] },     // #D6D3CE (warm light gray)
+  { id: 'feedback', bg: [229, 229, 229] },  // #E5E5E5
+  { id: 'book', bg: [247, 245, 242] },      // #F7F5F2
 ];
 
 function interpolateColor(color1: number[], color2: number[], factor: number) {
@@ -16,6 +16,15 @@ function interpolateColor(color1: number[], color2: number[], factor: number) {
     result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
   }
   return result;
+}
+
+// Calculate relative luminance based on WCAG
+function getLuminance(r: number, g: number, b: number) {
+  const a = [r, g, b].map(function (v) {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
 }
 
 export default function ScrollColorManager() {
@@ -56,18 +65,17 @@ export default function ScrollColorManager() {
       const nextColor = colorStops[nextStopIndex];
 
       const interpolatedBg = interpolateColor(currentColor.bg, nextColor.bg, factor);
-      const interpolatedText = interpolateColor(currentColor.text, nextColor.text, factor);
 
       document.body.style.setProperty('--bg-color', `rgb(${interpolatedBg[0]}, ${interpolatedBg[1]}, ${interpolatedBg[2]})`);
       document.body.style.setProperty('--bg-rgb', `${interpolatedBg[0]}, ${interpolatedBg[1]}, ${interpolatedBg[2]}`);
-      document.body.style.setProperty('--text-color', `rgb(${interpolatedText[0]}, ${interpolatedText[1]}, ${interpolatedText[2]})`);
       
-      // Determine contrast threshold for muted text
-      const brightness = (interpolatedBg[0] * 299 + interpolatedBg[1] * 587 + interpolatedBg[2] * 114) / 1000;
-      if (brightness > 128) {
-        document.body.style.setProperty('--text-muted-color', 'var(--text-muted-dark)');
+      // Determine contrast threshold using exact WCAG luminance
+      const luminance = getLuminance(interpolatedBg[0], interpolatedBg[1], interpolatedBg[2]);
+      
+      if (luminance > 0.45) {
+        document.body.setAttribute('data-theme', 'light');
       } else {
-        document.body.style.setProperty('--text-muted-color', 'var(--text-muted-light)');
+        document.body.setAttribute('data-theme', 'dark');
       }
     };
 
@@ -77,13 +85,13 @@ export default function ScrollColorManager() {
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      // Reset colors when leaving page
+      // Reset styles when leaving page
       document.body.style.removeProperty('--bg-color');
       document.body.style.removeProperty('--bg-rgb');
-      document.body.style.removeProperty('--text-color');
-      document.body.style.removeProperty('--text-muted-color');
+      document.body.removeAttribute('data-theme');
     };
   }, []);
 
   return null; // This is a logic-only component
 }
+

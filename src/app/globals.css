@@ -23,6 +23,16 @@
   --font-sans: 'Inter', sans-serif;
 }
 
+body[data-theme="dark"] {
+  --text-color: var(--text-light);
+  --text-muted-color: var(--text-muted-light);
+}
+
+body[data-theme="light"] {
+  --text-color: var(--text-dark);
+  --text-muted-color: var(--text-muted-dark);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -37,7 +47,7 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: background-color 0.1s ease-out, color 0.3s ease;
+  transition: background-color 0.1s ease-out, color 0.15s ease;
   overflow-x: hidden;
 }
 
@@ -506,39 +516,86 @@ input:focus, select:focus, textarea:focus {
 /* Work Section */
 .work-section {
   position: relative;
+  background-color: var(--bg-color); /* ensures opacity to hide DNA */
+  z-index: 20;
 }
 
 .dna-placeholder-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 30%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
+  display: none;
 }
 
 .work-content {
-  max-width: 800px;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .work-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 4rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
   margin-bottom: 6rem;
+  width: 100%;
+  align-items: stretch;
 }
 
 .work-card {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  background: #141414;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: flex-basis 0.35s ease, transform 0.35s ease, opacity 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  will-change: flex-basis, transform, opacity;
+}
+
+/* Hover expansion */
+@media (min-width: 769px) {
+  .work-grid:has(.work-card:hover) .work-card:not(:hover) {
+    flex: 0.7;
+    opacity: 0.4;
+    transform: scale(0.98);
+  }
+  .work-grid .work-card:hover {
+    flex: 1.5;
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15);
+    opacity: 1;
+    z-index: 2;
+  }
+}
+
+.work-card-content h3 {
+  color: #FFFFFF;
+}
+
+.work-card-content p, .work-card-content .pull-quote, .work-card-content .work-details {
+  color: #A0A0A0;
+}
+
+@media (max-width: 768px) {
+  .work-grid {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 2rem;
+    scrollbar-width: none; /* Firefox */
+  }
+  .work-grid::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+  .work-card {
+    min-width: 85vw;
+    scroll-snap-align: center;
+  }
 }
 
 .work-card-wide {
-  margin-top: 2rem;
-  padding-top: 4rem;
-  border-top: 1px solid var(--text-muted-color);
+  margin-top: 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .client-type {

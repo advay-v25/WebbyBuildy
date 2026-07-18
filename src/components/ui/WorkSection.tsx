@@ -17,7 +17,20 @@ export default function WorkSection() {
           </div>
           
           <div className="work-grid">
-            <div className="work-card reveal">
+            <div className="work-card work-card-wide reveal">
+              <div className="work-card-header">
+                <span className="client-type">AND WHEN THE PROJECT IS BIGGER…</span>
+                <h3>PlannrAI</h3>
+              </div>
+              <div className="placeholder-image aspect-wide">
+                [IMAGE: PlannrAI screens]
+              </div>
+              <div className="work-card-content">
+                <p className="work-details">A full AI-powered day-planning web app for college students — designed, built, and shipped by us as co-founders. Not a client website: a complete software product.</p>
+              </div>
+            </div>
+
+            <div className="work-card reveal" style={{ transitionDelay: '0.1s' }}>
               <div className="placeholder-image aspect-video">
                 [IMAGE: client site 1 screenshot]
               </div>
@@ -30,7 +43,7 @@ export default function WorkSection() {
               </div>
             </div>
 
-            <div className="work-card reveal" style={{ transitionDelay: '0.1s' }}>
+            <div className="work-card reveal" style={{ transitionDelay: '0.2s' }}>
               <div className="placeholder-image aspect-video">
                 [IMAGE: client site 2 screenshot]
               </div>
@@ -40,19 +53,6 @@ export default function WorkSection() {
                 <p className="work-details">Goal: a professional presence that brings enquiries, not just exists.</p>
                 <p className="built-in">Built in [X] days.</p>
                 <blockquote className="pull-quote">"[Client quote placeholder — speed and communication]"</blockquote>
-              </div>
-            </div>
-
-            <div className="work-card work-card-wide reveal" style={{ transitionDelay: '0.2s' }}>
-              <div className="work-card-header">
-                <span className="client-type">AND WHEN THE PROJECT IS BIGGER…</span>
-                <h3>PlannrAI</h3>
-              </div>
-              <div className="placeholder-image aspect-wide">
-                [IMAGE: PlannrAI screens]
-              </div>
-              <div className="work-card-content">
-                <p className="work-details">A full AI-powered day-planning web app for college students — designed, built, and shipped by us as co-founders. Not a client website: a complete software product.</p>
               </div>
             </div>
           </div>
