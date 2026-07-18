@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { View } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
 import Keyboard from '@/components/3d/Keyboard';
 
 export default function Home() {
@@ -77,9 +77,9 @@ export default function Home() {
             transform: isTransitioning ? 'scale(0.9) translateY(40px)' : 'scale(1) translateY(0)'
           }}
         >
-          <View className="keyboard-view" style={{ width: '100%', height: '100%' }}>
+          <Canvas className="keyboard-view" style={{ width: '100%', height: '100%' }}>
             <Keyboard isSpacePressed={isSpacePressed} transitioning={isTransitioning} />
-          </View>
+          </Canvas>
         </div>
       </div>
 

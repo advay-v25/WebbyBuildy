@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Toolbar from "@/components/ui/Toolbar";
-import GlobalCanvas from "@/components/3d/GlobalCanvas";
 
 export const metadata: Metadata = {
   title: "[BRAND NAME] — Web Design Studio, Mumbai",
@@ -33,7 +32,6 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-XXXXXXXXXX');` }} /> */}
       </head>
       <body>
-        <GlobalCanvas />
         <Toolbar />
         <main>{children}</main>
       </body>

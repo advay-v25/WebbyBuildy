@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 const colorStops = [
   { id: 'work', bg: [10, 10, 10] },         // #0A0A0A
   { id: 'about', bg: [214, 211, 206] },     // #D6D3CE (warm light gray)
-  { id: 'feedback', bg: [229, 229, 229] },  // #E5E5E5
   { id: 'book', bg: [247, 245, 242] },      // #F7F5F2
+  { id: 'feedback', bg: [229, 229, 229] },  // #E5E5E5
 ];
 
 function interpolateColor(color1: number[], color2: number[], factor: number) {

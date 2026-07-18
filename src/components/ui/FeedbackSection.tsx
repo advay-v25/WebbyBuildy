@@ -37,7 +37,6 @@ const faqs = [
 
 export default function FeedbackSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   useScrollReveal(sectionRef);
 
@@ -45,37 +44,42 @@ export default function FeedbackSection() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitted(true);
-  };
-
   return (
     <section id="feedback" className="section feedback-section" ref={sectionRef}>
       <div className="container relative-content">
         <div className="feedback-grid">
           <div className="feedback-form-block reveal">
-            <h2 className="section-title">We value your feedback</h2>
-            <p className="section-intro">Tell us what you think — of this site, of an idea you have, of anything.</p>
+            <h2 className="section-title" style={{ marginBottom: '1rem' }}>Let us know your feedback</h2>
+            <p className="section-intro">
+              Tell us what you think — of this site, of an idea you have, of anything.
+            </p>
             
-            {isSubmitted ? (
-              <div className="success-state">
-                <p>Thanks — we read everything.</p>
-              </div>
-            ) : (
-              <form className="feedback-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <input type="text" placeholder="Name (optional)" aria-label="Name (optional)" />
-                </div>
-                <div className="form-group">
-                  <textarea placeholder="Your message..." rows={5} required aria-label="Your message"></textarea>
-                </div>
-                <input type="text" name="b_name" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
-                
-                <button type="submit" className="btn-primary">Send Feedback</button>
-              </form>
-            )}
-            <span style={{ display: 'none' }}>starting at ₹[___]</span>
+            <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <a 
+                href="mailto:aaravaher25@gmail.com" 
+                style={{ 
+                  color: 'var(--accent)', 
+                  fontWeight: 700, 
+                  textDecoration: 'none', 
+                  fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+                  display: 'inline-block',
+                  transition: 'transform 0.2s ease, text-decoration 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.textDecoration = 'underline';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.textDecoration = 'none';
+                }}
+              >
+                aaravaher25@gmail.com
+              </a>
+              <p className="text-muted" style={{ fontSize: '1.1rem' }}>
+                or <a href="https://wa.me/919619011111" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>WhatsApp us</a>
+              </p>
+            </div>
           </div>
 
           <div className="faq-block reveal">
