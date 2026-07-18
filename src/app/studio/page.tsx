@@ -6,8 +6,6 @@ import WorkSection from '@/components/ui/WorkSection';
 import AboutSection from '@/components/ui/AboutSection';
 import FeedbackSection from '@/components/ui/FeedbackSection';
 import BookSection from '@/components/ui/BookSection';
-import { View } from '@react-three/drei';
-import DNA from '@/components/3d/DNA';
 
 export default function StudioPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -28,13 +26,6 @@ export default function StudioPage() {
     <div className="studio-page-container" ref={scrollRef}>
       <ScrollColorManager />
       
-      {/* Global DNA Background layer for the studio page */}
-      <div className="dna-global-background">
-        <View className="dna-view" style={{ width: '100%', height: '100%' }}>
-          <DNA scrollRef={scrollRef} />
-        </View>
-      </div>
-
       <WorkSection />
       <AboutSection />
       <FeedbackSection />
