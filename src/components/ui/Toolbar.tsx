@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { CALENDLY_URL } from '@/lib/constants';
 
 export default function Toolbar() {
   const pathname = usePathname();
@@ -41,9 +42,9 @@ export default function Toolbar() {
           <Link href="/studio#work" onClick={() => setIsMobileMenuOpen(false)}>Work</Link>
           <Link href="/studio#about" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
           <Link href="/studio#feedback" onClick={() => setIsMobileMenuOpen(false)}>FAQ</Link>
-          <Link href="/studio#book" className="btn-primary btn-nav" onClick={() => setIsMobileMenuOpen(false)}>
+          <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="btn-primary btn-nav" onClick={() => setIsMobileMenuOpen(false)}>
             Book a Free Call
-          </Link>
+          </a>
         </nav>
       </div>
     </header>

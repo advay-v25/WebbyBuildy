@@ -18,8 +18,8 @@ export default function AboutSection() {
               [IMAGE: founder photo 1]
             </div>
             <div className="founder-info">
-              <h3>[Name 1] — [role]</h3>
-              <p className="founder-bio">[One-line bio placeholder]</p>
+              <h3>Aarav Aher</h3>
+              <p className="founder-bio">Student at Northeastern University</p>
             </div>
           </div>
           <div className="founder-card reveal" style={{ transitionDelay: '0.1s' }}>
@@ -27,8 +27,8 @@ export default function AboutSection() {
               [IMAGE: founder photo 2]
             </div>
             <div className="founder-info">
-              <h3>[Name 2] — [role]</h3>
-              <p className="founder-bio">[One-line bio placeholder]</p>
+              <h3>Abhimanyu Gupta</h3>
+              <p className="founder-bio">Cadet with IndiGo</p>
             </div>
           </div>
           <div className="founder-card reveal" style={{ transitionDelay: '0.2s' }}>
@@ -36,15 +36,15 @@ export default function AboutSection() {
               [IMAGE: founder photo 3]
             </div>
             <div className="founder-info">
-              <h3>[Name 3] — [role]</h3>
-              <p className="founder-bio">[One-line bio placeholder]</p>
+              <h3>Advay Vaidya</h3>
+              <p className="founder-bio">CFA Aspirant</p>
             </div>
           </div>
         </div>
 
         <div className="story-block reveal">
           <p className="story-text">
-            We're three university students in Mumbai who build websites the way agencies will in five years — with modern AI-assisted tools that turn months of work into days. We built and shipped our own product, PlannrAI, then started building sites for people around us. Now we do it properly: custom design, honest timelines, and you always talk directly to one of us three. [PLACEHOLDER: refine to ~150 words]
+            We're three friends from Mumbai on very different paths — engineering, aviation, finance — with one shared skill: we build fast with the AI-assisted tools agencies will be using in five years. We built and shipped our own product, PlannrAI, then started building websites for people around us. Now we do it properly. Custom design, honest timelines, a fixed written quote before we start — and you'll always talk directly to one of us three, never an account manager.
           </p>
         </div>
 

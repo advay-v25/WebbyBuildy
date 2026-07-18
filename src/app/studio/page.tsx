@@ -28,8 +28,8 @@ export default function StudioPage() {
       
       <WorkSection />
       <AboutSection />
-      <FeedbackSection />
       <BookSection />
+      <FeedbackSection />
     </div>
   );
 }
