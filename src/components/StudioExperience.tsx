@@ -80,9 +80,9 @@ export function StudioExperience() {
         <section className={`${styles.foundersSection} ${styles.studioPageFounders}`}>
           <div data-studio-copy className={styles.foundersIntro}>
             <p className={styles.mono}>MUMBAI / FOUNDERS</p>
-            <h1>Three paths.<br /><span>One studio.</span></h1>
-            <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now.</p>
-            <p className={styles.founderSmall}>Engineering, aviation, and finance gave us three different ways of thinking. WebbyBuildy is where they meet: precise systems, calm execution, and work built to perform.</p>
+            <h1>Three paths<br /><span>One studio</span></h1>
+            <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now</p>
+            <p className={styles.founderSmall}>Engineering, aviation, and finance gave us three different ways of thinking WebbyBuildy is where they meet: precise systems, calm execution, and work built to perform</p>
             <a href="#studio-manifesto" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></a>
           </div>
           <div data-studio-grid className={styles.founderGrid}>
@@ -114,16 +114,16 @@ export function StudioExperience() {
         <section id="studio-manifesto" data-manifesto className={styles.studioManifesto}>
           <span data-manifesto-signal className={styles.manifestoSignal} aria-hidden="true" />
           <p className={styles.mono}>HOW WE WORK</p>
-          <h2>You talk to the people<br />doing the work.</h2>
+          <h2>You talk to the people<br />doing the work</h2>
           <div>
-            <p>Direct WhatsApp and calls. Clear timelines. A fixed written quote before we start.</p>
-            <p>No account managers, no agency bureaucracy, and no hand-offs between sales and production.</p>
+            <p>Direct WhatsApp and calls Clear timelines A fixed written quote before we start</p>
+            <p>No account managers, no agency bureaucracy, and no hand-offs between sales and production</p>
           </div>
         </section>
 
         <section id="contact" className={styles.contactSection}>
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
-          <div><h2>Got an idea?<br />Let’s build <span>it.</span></h2><a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a></div>
+          <div><h2>Got an idea?<br />Let’s build <span>it</span></h2><a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a></div>
           <Link href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
           <footer><span>Mumbai · India</span><span>WEBBYBUILDY © {new Date().getFullYear()}</span></footer>
         </section>
