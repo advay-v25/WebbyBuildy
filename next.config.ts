@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
 
-const isProd = process.env.NODE_ENV === 'production';
-const basePath = isProd ? '/WebbyBuildy' : '';
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+const basePath = isGithubActions ? '/WebbyBuildy' : '';
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // Use static export and unoptimized images ONLY on GitHub Pages.
+  // Vercel supports native Next.js features and doesn't need a basePath.
+  output: isGithubActions ? 'export' : undefined,
   images: {
-    unoptimized: true,
+    unoptimized: isGithubActions,
   },
   basePath,
   assetPrefix: basePath,
