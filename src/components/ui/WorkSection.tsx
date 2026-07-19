@@ -1,16 +1,18 @@
 "use client";
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image';
+import plannraiLogo from '../../../public/images/plannrai-logo.png';
+import plannraiHero from '../../../public/images/plannrai-hero.png';
 
 interface WorkCardProps {
   label: string;
   title: string;
-  logo?: string;
+  logo?: string | StaticImageData;
   linkHref?: string;
   linkText?: string;
-  image?: string;
+  image?: string | StaticImageData;
   imagePlaceholderText?: string;
   goal: string;
   meta: string;
@@ -78,8 +80,68 @@ function WorkCard({ label, title, logo, linkHref, linkText, image, imagePlacehol
 
 export default function WorkSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const [flippedCard, setFlippedCard] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+  
   useScrollReveal(sectionRef);
+
+  useEffect(() => {
+    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isCompleted || prefersReducedMotion) {
+      if (prefersReducedMotion && !isCompleted) setIsCompleted(true);
+      return;
+    }
+
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+
+    const handleProgress = (currentProgress: number) => {
+      setProgress((prev) => {
+        const next = Math.max(prev, currentProgress);
+        if (next >= 1) {
+          setIsCompleted(true);
+          return 1;
+        }
+        return next;
+      });
+    };
+
+    if (isTouchDevice) {
+      const handleScroll = () => {
+        if (!timelineRef.current) return;
+        const rect = timelineRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        let p = (windowHeight - rect.top - windowHeight * 0.1) / (rect.height * 0.8);
+        p = Math.max(0, Math.min(1, p));
+        handleProgress(p);
+      };
+      
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+      return () => window.removeEventListener('scroll', handleScroll);
+    } else {
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!timelineRef.current) return;
+        const rect = timelineRef.current.getBoundingClientRect();
+        if (e.clientY >= rect.top - 100 && e.clientY <= rect.bottom + 100) {
+          let p = (e.clientX - rect.left) / rect.width;
+          p = Math.max(0, Math.min(1, p));
+          handleProgress(p);
+        }
+      };
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
+  }, [isCompleted]);
+
+  const steps = [
+    { num: 1, title: 'Free intro call', text: 'Free 30-minute intro call: we understand your goals, style, and content.' },
+    { num: 2, title: 'Proposal in 48 hours', text: 'Written proposal within 48 hours: exact scope, timeline, and a fixed price. No hourly billing, no surprises.' },
+    { num: 3, title: 'First draft in days', text: 'A real, working website that can be reviewed on a call. No sketches or rough drafts.' },
+    { num: 4, title: 'Unlimited revisions', text: 'We refine until you love it. Unlimited revisions until launch, at no extra cost.' },
+    { num: 5, title: 'Launch & handover', text: 'Your site goes live. You own everything: domain, content, code.' }
+  ];
 
   return (
     <section id="work" className="section work-section" ref={sectionRef}>
@@ -94,21 +156,21 @@ export default function WorkSection() {
             <WorkCard 
               label="AND WHEN THE PROJECT IS BIGGER…"
               title="PlannrAI"
-              logo="/images/plannrai-logo.png"
+              logo={plannraiLogo}
               linkHref="https://plannrai.in"
               linkText="plannrai.in"
-              image="/images/plannrai-hero.png"
+              image={plannraiHero}
               goal="Goal: prove we can build far more than websites."
               meta="Built and shipped as co-founders."
-              quote="A complete AI-powered software product — designed, built, and launched by the three of us."
+              quote="A complete AI-powered software product with multiple APIs and functions: designed, built, and launched by us."
             />
             <WorkCard 
               label="PERSONAL BRAND SITE"
-              title="[Client 1 name] — [profession]"
+              title="[Client 1 name], [profession]"
               imagePlaceholderText="[IMAGE: client site 1 screenshot]"
               goal="Goal: a credible online identity that looks as good as their work."
               meta="Built in [X] days."
-              quote="[Client quote placeholder — speed and communication]"
+              quote="[Client quote placeholder: speed and communication]"
               delay="0.1s"
             />
             <WorkCard 
@@ -117,7 +179,7 @@ export default function WorkSection() {
               imagePlaceholderText="[IMAGE: client site 2 screenshot]"
               goal="Goal: a professional presence that brings enquiries, not just exists."
               meta="Built in [X] days."
-              quote="[Client quote placeholder — speed and communication]"
+              quote="[Client quote placeholder: speed and communication]"
               delay="0.2s"
             />
           </div>
@@ -136,7 +198,7 @@ export default function WorkSection() {
               <span className="chip" tabIndex={0}>Logo & brand kits</span>
             </div>
             <p className="prominent-line">
-              Whatever you need your website to do, tell us on a call — we'll figure out the right build together. No request is too small or too odd.
+              Whatever you need your website to do, tell us on a call and we'll figure out the right build together. No request is too small or too odd.
             </p>
           </div>
 
@@ -151,34 +213,45 @@ export default function WorkSection() {
             </ul>
           </div>
 
-          <div className="timeline-block reveal">
+          <div className="timeline-block reveal" ref={timelineRef}>
             <h3>How it works</h3>
-            <div className="timeline-horizontal">
-              <div className="timeline-line"></div>
-              {[
-                { num: 1, title: 'Free intro call', text: 'Free 30-minute intro call — we understand your goals, style, and content.' },
-                { num: 2, title: 'Proposal in 48 hours', text: 'Written proposal within 48 hours — exact scope, timeline, and a fixed price. No hourly billing, no surprises.' },
-                { num: 3, title: 'First draft in days', text: 'A real working site, not sketches — reviewed together on a call.' },
-                { num: 4, title: 'Unlimited revisions', text: 'We refine until you love it. Unlimited revisions until launch, at no extra cost.' },
-                { num: 5, title: 'Launch & handover', text: 'Your site goes live. You own everything: domain, content, code.' }
-              ].map((step, idx) => (
+            <div className="timeline-zigzag-container">
+              
+              <div className="timeline-bar-base">
                 <div 
-                  key={idx} 
-                  className={`flip-card-container timeline-step-card ${flippedCard === idx ? 'flipped' : ''}`}
-                  onClick={() => setFlippedCard(flippedCard === idx ? null : idx)}
-                  style={{ animationDelay: `${idx * 0.12}s` }}
-                >
-                  <div className="flip-card-inner">
-                    <div className="flip-card-front">
-                      <div className="step-number">{step.num}</div>
-                      <h4>{step.title}</h4>
+                  className="timeline-bar-fill" 
+                  style={{ '--progress': isCompleted ? 1 : progress } as any}
+                />
+              </div>
+
+              <div className="timeline-cards-grid">
+                {steps.map((step, idx) => {
+                  const nodeProgressPoint = idx / (steps.length - 1); // 0, 0.25, 0.5, 0.75, 1
+                  const isActive = isCompleted || progress >= (nodeProgressPoint - 0.05); // slight early trigger
+                  const isTop = idx % 2 === 0;
+
+                  return (
+                    <div key={idx} className={`timeline-step-wrapper ${isTop ? 'top-card' : 'bottom-card'}`}>
+                      <div className={`timeline-node ${isActive ? 'active' : ''}`}>{step.num}</div>
+                      <div className="timeline-stem"></div>
+                      <div 
+                        className={`flip-card-container timeline-step-card ${flippedCard === idx ? 'flipped' : ''}`}
+                        onClick={() => setFlippedCard(flippedCard === idx ? null : idx)}
+                        style={{ animationDelay: `${idx * 0.12}s` }}
+                      >
+                        <div className="flip-card-inner">
+                          <div className="flip-card-front">
+                            <h4>{step.title}</h4>
+                          </div>
+                          <div className="flip-card-back">
+                            <p>{step.text}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flip-card-back">
-                      <p>{step.text}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

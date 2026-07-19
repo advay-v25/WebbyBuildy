@@ -116,7 +116,7 @@ export default function BookSection() {
               <h2 className="section-title">Got an idea? Let's talk.</h2>
               <div className="section-descriptor">
                 <p className="descriptor-lead"><strong>A free, no-obligation 30-minute call.</strong></p>
-                <p className="descriptor-body text-muted">When booking, leave your name and a line on what you need the website for — it helps us come prepared.</p>
+                <p className="descriptor-body text-muted">When booking, leave your name and a line on what you need the website for. It helps us come prepared.</p>
                 <p className="descriptor-body text-muted" style={{ marginTop: '0.75rem' }}>Within 48 hours of the call, you'll receive a written proposal with a fixed price and a clear timeline. Decide in your own time.</p>
               </div>
 
@@ -171,7 +171,7 @@ export default function BookSection() {
             <span className="dot-separator">·</span>
             <a href="#">[Social Link 2]</a>
           </div>
-          <p className="footer-note text-muted">This site is our own work — it's what a first draft from us looks like.</p>
+          <p className="footer-note text-muted">This site is our own work. It's what a first draft from us looks like.</p>
         </div>
       </footer>
     </section>

@@ -56,14 +56,14 @@ export default function Home() {
           opacity: isTransitioning ? 0 : 1 
         }}
       >
-        <div className="hero-kicker">[BRAND NAME] — WEB DESIGN STUDIO, MUMBAI</div>
+        <div className="hero-kicker">[BRAND NAME] · WEB DESIGN STUDIO, MUMBAI</div>
         <h1 className="hero-title">
           <span className="muted-line" style={{ color: '#9CA3AF' }}>Most websites take months and cost lakhs.</span>
           <br />
           <strong className="bright-line" style={{ color: 'white' }}>Yours will take days.</strong>
         </h1>
         <p className="hero-subline">
-          Custom-designed websites for your brand or business — built by three people you'll actually talk to.
+          Custom-designed websites for your brand or business, built by three people you'll actually talk to.
         </p>
       </div>
 
