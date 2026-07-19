@@ -7,7 +7,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 const faqs = [
   {
     q: "How much does a website cost?",
-    a: "Every project gets a fixed, written quote in your proposal within 48 hours of the intro call — no hourly billing, no surprises. You pay an advance to begin, and the balance only once your site is live."
+    a: "Every project gets a fixed, written quote in your proposal within 48 hours of the intro call. No hourly billing, no surprises. You pay an advance to begin, and the balance only once your site is live."
   },
   {
     q: "How fast is \"fast\"?",
@@ -15,11 +15,11 @@ const faqs = [
   },
   {
     q: "Who owns the website after launch?",
-    a: "You do — domain, content, code, everything."
+    a: "You do: domain, content, code, everything."
   },
   {
     q: "Is it a template?",
-    a: "No. Every site is designed from scratch for you. AI-accelerated tools are why we're fast — not why it's generic."
+    a: "No. Every site is designed from scratch for you. AI-accelerated tools are why we're fast, not why it's generic."
   },
   {
     q: "What counts as a revision?",
@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: "What do you need from me?",
-    a: "Content, photos, and a call. We handle the rest — including writing your copy if needed."
+    a: "Content, photos, and a call. We handle the rest, including writing your copy if needed."
   }
 ];
 
@@ -51,7 +51,7 @@ export default function FeedbackSection() {
           <div className="feedback-form-block reveal">
             <h2 className="section-title" style={{ marginBottom: '1rem' }}>Let us know your feedback</h2>
             <p className="section-intro">
-              Tell us what you think — of this site, of an idea you have, of anything.
+              Tell us what you think: of this site, of an idea you have, of anything.
             </p>
             
             <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
