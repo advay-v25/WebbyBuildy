@@ -10,7 +10,7 @@ This file lists all the placeholders used in the Web Design Studio website and w
 
 ## Work Section (`src/components/ui/WorkSection.tsx`)
 - `[IMAGE: client site 1 screenshot]`
-- `[IMAGE: client site 2 screenshot]`
+- ~~`[IMAGE: client site 2 screenshot]`~~ (Resolved to client3-consulting.png)
 - ~~`[IMAGE: PlannrAI screens]`~~ (Resolved to plannrai-hero.png)
 - `[profession]`
 - `[PLACEHOLDER]` (Goal / What we built)

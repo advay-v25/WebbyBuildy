@@ -45,7 +45,7 @@ export default function AboutSection() {
 
         <div className="story-block reveal">
           <p className="story-text">
-            We're three friends from Mumbai on very different paths — engineering, aviation, finance — with one shared skill: we build fast with the AI-assisted tools agencies will be using in five years. We built and shipped our own product, PlannrAI, then started building websites for people around us. Now we do it properly. Custom design, honest timelines, a fixed written quote before we start — and you'll always talk directly to one of us three, never an account manager.
+            We're three friends from Mumbai with one shared skill: we build fast with the AI-assisted tools agencies will be using in five years. We built and shipped our own product, PlannrAI, then started building websites for people around us. Now we do it properly. Custom design, honest timelines, a fixed written quote before we start, and you'll always talk directly to one of us three, never an account manager.
           </p>
         </div>
 
@@ -57,16 +57,16 @@ export default function AboutSection() {
 
         <div className="testimonials-grid">
           <div className="testimonial-card reveal">
-            <blockquote className="testimonial-quote">"[Client quote placeholder — must mention speed and communication]"</blockquote>
-            <p className="testimonial-author">— [Name, client type]</p>
+            <blockquote className="testimonial-quote">"[Client quote placeholder: must mention speed and communication]"</blockquote>
+            <p className="testimonial-author">[Name, client type]</p>
           </div>
           <div className="testimonial-card reveal" style={{ transitionDelay: '0.1s' }}>
-            <blockquote className="testimonial-quote">"[Client quote placeholder — must mention speed and communication]"</blockquote>
-            <p className="testimonial-author">— [Name, client type]</p>
+            <blockquote className="testimonial-quote">"[Client quote placeholder: must mention speed and communication]"</blockquote>
+            <p className="testimonial-author">[Name, client type]</p>
           </div>
           <div className="testimonial-card reveal" style={{ transitionDelay: '0.2s' }}>
-            <blockquote className="testimonial-quote">"[Client quote placeholder — must mention speed and communication]"</blockquote>
-            <p className="testimonial-author">— [Name, client type]</p>
+            <blockquote className="testimonial-quote">"[Client quote placeholder: must mention speed and communication]"</blockquote>
+            <p className="testimonial-author">[Name, client type]</p>
           </div>
         </div>
       </div>
