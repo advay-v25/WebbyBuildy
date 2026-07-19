@@ -23,10 +23,10 @@ export function BookExperience() {
         <div className={styles.bookingAtmosphere} aria-hidden="true"><i /><i /><i /></div>
         <section className={styles.bookingCopy}>
           <motion.h1 initial={{ opacity: 0, y: 44 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, ease: [.16, 1, .3, 1] }}>
-            Let’s make something<br /><em>impossible to ignore.</em>
+            Let’s make something<br /><em>impossible to ignore</em>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .14, duration: .65 }}>
-            A focused 30-minute call. No pitch. Just your idea, the audience, and what the site needs to do.
+            A focused 30-minute call No pitch Just your idea, the audience, and what the site needs to do
           </motion.p>
           <div className={styles.bookingContacts}>
             <a href="mailto:aaravaher25@gmail.com"><Mail aria-hidden="true" /><span><small>Email</small>aaravaher25@gmail.com</span></a>
@@ -42,7 +42,7 @@ export function BookExperience() {
           <div className={styles.bookingPanel}>
             <div className={styles.bookingPanelHead}><span><CalendarDays /> Plan the call</span><small>30 MIN · GOOGLE MEET</small></div>
             <h2>Choose a call window</h2>
-            <p>Pick the part of the day that usually works best. Calendly will show the exact live slots.</p>
+            <p>Pick the part of the day that usually works best Calendly will show the exact live slots</p>
             <div className={styles.callWindows}>
               {callWindows.map(([label, time], index) => (
                 <motion.button key={label} data-active={selectedWindow === index} onClick={() => setSelectedWindow(index)} whileTap={{ scale: .98 }}>
@@ -58,7 +58,7 @@ export function BookExperience() {
             <motion.a href={CALENDLY_URL} target="_blank" rel="noreferrer" className={styles.confirmCall} whileHover={{ y: -3 }} whileTap={{ scale: .985 }}>
               See live availability <ArrowUpRight aria-hidden="true" />
             </motion.a>
-            <small className={styles.bookingNote}>No commitment. You’ll receive a fixed proposal after the call.</small>
+            <small className={styles.bookingNote}>No commitment You’ll receive a fixed proposal after the call</small>
           </div>
         </motion.section>
         <div className={styles.bookingSignal} aria-hidden="true"><i /></div>

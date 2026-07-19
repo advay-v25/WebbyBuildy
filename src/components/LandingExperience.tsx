@@ -16,10 +16,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 gsap.registerPlugin(ScrollTrigger);
 
 const processSteps = [
-  ["01", "Talk", "We learn the idea, the audience, and what success looks like."],
-  ["02", "Proposal", "A clear scope, timeline, and fixed written quote within 48 hours."],
-  ["03", "Build", "A working first draft in days, shaped with you in direct reviews."],
-  ["04", "Launch", "We test, launch, hand over everything, and stay available."],
+  ["01", "Talk", "We learn the idea, the audience, and what success looks like"],
+  ["02", "Proposal", "A clear scope, timeline, and fixed written quote within 48 hours"],
+  ["03", "Build", "A working first draft in days, shaped with you in direct reviews"],
+  ["04", "Launch", "We test, launch, hand over everything, and stay available"],
 ] as const;
 
 const founders = [
@@ -29,16 +29,16 @@ const founders = [
 ] as const;
 
 const capabilities = [
-  ["01", "Direction", "Clarity before pixels.", Compass],
-  ["02", "Design", "Beautiful, useful, on-brand.", PenTool],
-  ["03", "Development", "Fast, scalable, future-ready.", Braces],
-  ["04", "Motion", "Meaning in every movement.", Orbit],
+  ["01", "Direction", "Clarity before pixels", Compass],
+  ["02", "Design", "Beautiful, useful, on-brand", PenTool],
+  ["03", "Development", "Fast, scalable, future-ready", Braces],
+  ["04", "Motion", "Meaning in every movement", Orbit],
 ] as const;
 
 const projects = [
-  { number: "01", title: "PlannrAI", copy: "A complete AI-powered product, designed, built and launched by the three of us.", live: true, image: "/images/plannrai-hero.png", link: "https://plannrai.in" },
-  { number: "02", title: "Private Consulting Website", copy: "Goal: a private consulting page that positions an individual brand.", live: true, image: "/images/client3-consulting.png", link: "#" },
-  { number: "03", title: "Next project", copy: "There will be more work here soon.", live: false, image: "", link: "#" },
+  { number: "01", title: "PlannrAI", copy: "A complete AI-powered product, designed, built and launched by the three of us", live: true, image: "/images/plannrai-hero.png", link: "https://plannrai.in" },
+  { number: "02", title: "Private Consulting Website", copy: "Goal: a private consulting page that positions an individual brand", live: true, image: "/images/client3-consulting.png", link: "#" },
+  { number: "03", title: "Next project", copy: "There will be more work here soon", live: false, image: "", link: "#" },
 ] as const;
 
 const deckPose = (index: number, active: number) => {
@@ -359,12 +359,12 @@ export default function LandingExperience() {
       <main id="main-content">
         <section id="top" ref={hero} className={styles.hero}>
           <div data-hero-copy-wrap className={styles.heroCopy}>
-            <h1 aria-label="Websites that move at the speed of your idea.">
+            <h1 aria-label="Websites that move at the speed of your idea">
               <span className={styles.lineClip}><span data-hero-line>Websites that move</span></span>
               <span className={styles.lineClip}><span data-hero-line>at the speed of</span></span>
-              <span className={styles.lineClip}><span data-hero-line>your idea.</span></span>
+              <span className={styles.lineClip}><span data-hero-line>your idea</span></span>
             </h1>
-            <p data-hero-copy>Custom websites, built in days, directly with the people making them.</p>
+            <p data-hero-copy>Custom websites, built in days, directly with the people making them</p>
           </div>
 
           <div className={styles.heroMedia} aria-hidden="true">
@@ -407,17 +407,17 @@ export default function LandingExperience() {
             <div data-curtain-line className={styles.curtainLine} />
             <div data-curtain-copy>
               <span>Selected work / 2026</span>
-              <strong>Built to be used.<br /><em>Designed to be felt.</em></strong>
-              <p>Strategy, design, development and motion — without the agency drag.</p>
+              <strong>Built to be used<br /><em>Designed to be felt</em></strong>
+              <p>Strategy, design, development and motion — without the agency drag</p>
             </div>
           </div>
         </section>
 
         <section id="work" data-cinematic-section className={styles.workSection}>
           <div data-reveal className={styles.workHeading}>
-            <h2>Work that <span>earns</span> attention.</h2>
+            <h2>Work that <span>earns</span> attention</h2>
             <div className={styles.workUtility}>
-              <p>Three spaces. One is live. Two are ready for what comes next.</p>
+              <p>Three spaces One is live Two are ready for what comes next</p>
               <div className={styles.carouselControls} aria-label="Project carousel controls">
                 <button onClick={() => moveProject(-1)} aria-label="Previous project"><ArrowLeft size={17} /></button>
                 <span>0{activeProject + 1} / 03</span>
@@ -467,8 +467,8 @@ export default function LandingExperience() {
         <section data-capabilities data-cinematic-section className={styles.capabilitiesSection}>
           <div className={styles.capabilitiesCopy} data-capability-copy>
             <p className={styles.mono}>ONE CONTINUOUS SYSTEM</p>
-            <h2>From a spark to a<br />site people <em>remember.</em></h2>
-            <p>Strategy, design, development and motion—built as one continuous system.</p>
+            <h2>From a spark to a<br />site people <em>remember</em></h2>
+            <p>Strategy, design, development and motion—built as one continuous system</p>
           </div>
           <div className={styles.systemStage}>
             <div className={styles.systemRail} aria-hidden="true"><i /></div>
@@ -504,13 +504,13 @@ export default function LandingExperience() {
               <path data-energy-path pathLength="1" d="M-40 370 C90 340 120 288 230 300 S350 250 440 254 S540 195 625 208 S740 118 805 142 S920 60 1040 28" />
             </svg>
           </div>
-          <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job.</em><br />Every frame moves the story forward.</p>
+          <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
         </section>
 
         <section id="process" data-cinematic-section className={styles.processSection}>
           <div data-reveal className={styles.sectionHead}>
             <p className={styles.mono}>HOW IT WORKS</p>
-            <h2>From first call<br />to live site.</h2>
+            <h2>From first call<br />to live site</h2>
           </div>
           <div data-process-grid className={styles.processGrid}>
             <span data-process-signal className={styles.processSignal} aria-hidden="true" />
@@ -535,9 +535,9 @@ export default function LandingExperience() {
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
           <div data-reveal className={styles.foundersIntro}>
             <p className={styles.mono}>FOUNDERS / STUDIO</p>
-            <h2>Three paths.<br /><span>One studio.</span></h2>
-            <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now.</p>
-            <p className={styles.founderSmall}>You speak directly to the people designing and building your site. No account managers. No hand-offs.</p>
+            <h2>Three paths<br /><span>One studio</span></h2>
+            <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now</p>
+            <p className={styles.founderSmall}>You speak directly to the people designing and building your site No account managers No hand-offs</p>
                 <Link data-magnetic href="/studio" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
           </div>
           <div data-founder-grid className={styles.founderGrid}>
@@ -566,7 +566,7 @@ export default function LandingExperience() {
         <section id="contact" data-cinematic-section className={styles.contactSection}>
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
           <div data-reveal>
-            <h2>Got an idea?<br />Let’s build <span>it.</span></h2>
+            <h2>Got an idea?<br />Let’s build <span>it</span></h2>
             <a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a>
           </div>
           <Link data-reveal data-magnetic href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
