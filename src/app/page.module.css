@@ -53,6 +53,7 @@
 .spacePrompt:hover .spaceKey{transform:translateY(-2px);border-color:rgba(255,255,255,.62);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 60px #000,0 0 32px rgba(225,56,45,.13)}
 .spacePressed .spaceKey{transform:translateY(5px) scale(.985);background:linear-gradient(145deg,rgba(225,56,45,.36),rgba(9,9,9,.8));box-shadow:inset 0 5px 14px rgba(0,0,0,.72),0 7px 22px #000}
 .scrollLabel{display:flex;align-items:center;gap:6px;color:#9b9790;font:500 .61rem/1 var(--font-mono);text-transform:uppercase;letter-spacing:.13em}
+/* z-index:3 must stay >= .heroMedia's 2 (else invisible) and <= .hero::after's 3 (vignette paints last via source order at equal z-index, so it stays on top of the curtain) */
 .storyCurtain{position:absolute;z-index:3;inset:0;overflow:hidden;opacity:0;background:radial-gradient(circle at 73% 48%,rgba(225,56,45,.16),transparent 33%),#0a0a0a;color:var(--ivory);display:grid;place-items:center}
 .storyCurtain::before{content:"";position:absolute;inset:0;opacity:.17;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:6.25vw 6.25vw;mask-image:linear-gradient(90deg,transparent,#000 22%,#000 80%,transparent)}
 .storyCurtain>div:last-child{position:relative;z-index:2;width:calc(100% - var(--gutter)*2);display:grid;grid-template-columns:.34fr 1.25fr .42fr;gap:3vw;align-items:end}

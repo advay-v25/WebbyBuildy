@@ -92,7 +92,7 @@ export default function LandingExperience() {
     const cinematicTrigger = ScrollTrigger.getById("hero-cinematic");
     const destination = workSection
       ? window.scrollY + workSection.getBoundingClientRect().top - 18
-      : cinematicTrigger?.end ?? (hero.current?.offsetTop ?? 0) + window.innerHeight * 2.6;
+      : cinematicTrigger?.end ?? (hero.current?.offsetTop ?? 0) + window.innerHeight * 1.9;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     lenis?.scrollTo(destination, {
       duration: reducedMotion ? 0 : 4.2,

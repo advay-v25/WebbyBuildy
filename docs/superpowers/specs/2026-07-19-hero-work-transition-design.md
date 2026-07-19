@@ -23,6 +23,8 @@ Secondary issue: the keyboard "fragment" shatter (`[data-keyboard-fragment]`, 28
 - Reorder stacking so `.storyCurtain` sits above the now-transparent `.heroMedia` base. `.keyboardFragments` stays on top of the curtain, so fragments read as debris flying in front of text that's emerging behind them — matching what the existing timing (fragments and curtain overlapping between progress ~0.1–0.3) already implies but never delivers visually.
 - `.hero::after` (the vignette gradient, currently `z-index: 3`, already self-clears via `--hero-shade-opacity` by progress 0.3) keeps its position above everything — it's a translucent overlay, not a blocker, so no change needed there beyond confirming it still reads correctly against the new stack.
 
+> **As shipped:** only the `.storyCurtain` z-index change (1 → 3) was implemented; the `.heroMedia` background-fade and the fragment-above-curtain reordering described above were not — the plan's Task 1 found the single z-index fix sufficient (`.keyboardFragments` stays inside `.heroMedia`, so fragments now render *behind* the curtain rather than in front of it, per the final code review). Verified live and looks correct; the "fragments in front" layering above is the original design intent, not what's currently in the code.
+
 ### 2. Fragment choreography polish
 
 - Replace the per-column/per-row offset math with motion relative to a shared center origin, so the 28 pieces read as one explosion rather than independent drifting tiles.
