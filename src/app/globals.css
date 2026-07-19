@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
   --accent: #E63946;
@@ -20,7 +20,9 @@
   --text-color: var(--text-light);
   --text-muted-color: var(--text-muted-light);
 
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Archivo', Arial, sans-serif;
+  --font-display: 'Space Grotesk', 'Archivo', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
 }
 
 body[data-theme="dark"] {
@@ -39,9 +41,7 @@ body[data-theme="light"] {
   padding: 0;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; background:#090909; }
 
 body {
   font-family: var(--font-sans);
@@ -50,6 +50,9 @@ body {
   transition: background-color 0.1s ease-out, color 0.15s ease;
   overflow-x: hidden;
 }
+
+a, button { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; }
 
 main {
   position: relative;
