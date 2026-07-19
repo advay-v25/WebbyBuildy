@@ -151,7 +151,7 @@ export default function LandingExperience() {
         id: "hero-cinematic",
         trigger: hero.current,
         start: "top top",
-        end: "+=260%",
+        end: "+=190%",
         pin: true,
         scrub: 1.2,
         anticipatePin: 1,
