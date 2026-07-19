@@ -36,9 +36,9 @@ const capabilities = [
 ] as const;
 
 const projects = [
-  { number: "01", title: "PlannrAI", copy: "A complete AI-powered product, designed, built and launched by the three of us.", live: true },
-  { number: "02", title: "Next project", copy: "There will be more work here soon.", live: false },
-  { number: "03", title: "Next project", copy: "There will be more work here soon.", live: false },
+  { number: "01", title: "PlannrAI", copy: "A complete AI-powered product, designed, built and launched by the three of us.", live: true, image: "/images/plannrai-hero.png", link: "https://plannrai.in" },
+  { number: "02", title: "Private Consulting Website", copy: "Goal: a private consulting page that positions an individual brand.", live: true, image: "/images/client3-consulting.png", link: "#" },
+  { number: "03", title: "Next project", copy: "There will be more work here soon.", live: false, image: "", link: "#" },
 ] as const;
 
 const deckPose = (index: number, active: number) => {
@@ -364,7 +364,7 @@ export default function LandingExperience() {
               <span className={styles.lineClip}><span data-hero-line>at the speed of</span></span>
               <span className={styles.lineClip}><span data-hero-line>your idea.</span></span>
             </h1>
-            <p data-hero-copy>Custom websites, built in days — directly with the people making them.</p>
+            <p data-hero-copy>Custom websites, built in days, directly with the people making them.</p>
           </div>
 
           <div className={styles.heroMedia} aria-hidden="true">
@@ -446,18 +446,18 @@ export default function LandingExperience() {
               >
                 {project.live ? (
                   <div data-zoom-media className={styles.liveMedia}>
-                    <Image src="/images/plannrai-hero.png" alt="PlannrAI website home screen" fill loading="eager" sizes="(max-width: 800px) 100vw, 55vw" />
+                    <Image src={project.image} alt={`${project.title} website screenshot`} fill loading="eager" sizes="(max-width: 800px) 100vw, 55vw" />
                   </div>
                 ) : (
                   <><div className={styles.redSeam} aria-hidden="true" /><div className={styles.futureGeometry} aria-hidden="true"><i /><i /><i /></div></>
                 )}
-                <div className={styles.projectMeta}><span>{project.number} · {project.live ? "AI PRODUCT" : "NEXT PROJECT"}</span>{project.live ? <strong>LIVE</strong> : null}</div>
+                <div className={styles.projectMeta}><span>{project.number} · {project.live && project.title === "PlannrAI" ? "AI PRODUCT" : (project.live ? "CLIENT SITE" : "NEXT PROJECT")}</span>{project.live ? <strong>LIVE</strong> : null}</div>
                 <div className={styles.projectCopy}>
                   <h3>{project.live ? project.title : <>Next<br />project</>}</h3>
                   <p>{project.copy}</p>
                 </div>
-                {project.live && activeProject === index ? (
-                  <a className={styles.projectVisit} href="https://plannrai.in" target="_blank" rel="noreferrer" aria-label="Visit PlannrAI"><ArrowUpRight /></a>
+                {project.live && activeProject === index && project.link !== "#" ? (
+                  <a className={styles.projectVisit} href={project.link} target="_blank" rel="noreferrer" aria-label={`Visit ${project.title}`}><ArrowUpRight /></a>
                 ) : <ArrowDownRight className={styles.projectArrow} aria-hidden="true" />}
               </motion.article>
             ))}
