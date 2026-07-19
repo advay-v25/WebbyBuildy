@@ -5,6 +5,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import Image, { StaticImageData } from 'next/image';
 import plannraiLogo from '../../../public/images/plannrai-logo.png';
 import plannraiHero from '../../../public/images/plannrai-hero.png';
+import client3Consulting from '../../../public/images/client3-consulting.png';
 
 interface WorkCardProps {
   label: string;
@@ -174,10 +175,10 @@ export default function WorkSection() {
               delay="0.1s"
             />
             <WorkCard 
-              label="SMALL BUSINESS SITE"
-              title="[Client 2 business name]"
-              imagePlaceholderText="[IMAGE: client site 2 screenshot]"
-              goal="Goal: a professional presence that brings enquiries, not just exists."
+              label="CONSULTING & PERSONAL BRAND SITE"
+              title="Private Consulting Website"
+              image={client3Consulting}
+              goal="Goal: a private consulting page that positions an individual brand."
               meta="Built in [X] days."
               quote="[Client quote placeholder: speed and communication]"
               delay="0.2s"
