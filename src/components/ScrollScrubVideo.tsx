@@ -25,7 +25,7 @@ export default function ScrollScrubVideo() {
   const vignetteRef = useRef<HTMLDivElement>(null);
   const grainRef = useRef<HTMLDivElement>(null);
 
-  const lenis = useLenis(() => ScrollTrigger.update());
+  useLenis(() => ScrollTrigger.update());
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -38,7 +38,7 @@ export default function ScrollScrubVideo() {
   // Detect reduced motion
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mediaQuery.matches);
+    requestAnimationFrame(() => setReducedMotion(mediaQuery.matches));
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mediaQuery.addEventListener("change", handler);
     return () => mediaQuery.removeEventListener("change", handler);
