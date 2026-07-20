@@ -332,10 +332,10 @@ export default function LandingExperience() {
       ...processSignalTo,
       ease: "none",
       scrollTrigger: {
-        trigger: "[data-process-grid]",
-        start: "top 82%",
-        end: "bottom 48%",
-        scrub: 0.7,
+        trigger: "[data-process-track]",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
         onUpdate: (self) => {
           processProgressRef.current = self.progress;
           setActiveProcess(Math.min(processSteps.length - 1, Math.floor(self.progress * processSteps.length)));
@@ -565,35 +565,37 @@ export default function LandingExperience() {
           <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
         </section>
 
-        <section id="process" data-cinematic-section className={styles.processSection}>
-          <div data-reveal className={styles.sectionHead}>
-            <p className={styles.mono}>HOW IT WORKS</p>
-            <h2>From first call<br />to live site</h2>
-          </div>
-          <div data-process-grid className={styles.processGrid}>
-            <span data-process-signal className={styles.processSignal} aria-hidden="true" />
-            <AnimatePresence mode="wait">
-              <motion.aside key={activeProcess} className={styles.processDetail} initial={{ opacity: 0, x: -28, rotateY: -8 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} exit={{ opacity: 0, x: 20, rotateY: 6 }} transition={{ type: "spring", stiffness: 180, damping: 24 }}>
-                <span>ACTIVE STAGE · {processSteps[activeProcess][0]}</span>
-                <h3>{processSteps[activeProcess][1]}</h3>
-                <p>{processSteps[activeProcess][2]}</p>
-              </motion.aside>
-            </AnimatePresence>
-            <div className={styles.processNodes}>
-              {processSteps.map(([number, title], index) => (
-                <button 
-                  ref={el => { processNodesRef.current[index] = el; }}
-                  data-process-step 
-                  data-active={activeProcess === index} 
-                  aria-pressed={activeProcess === index} 
-                  onClick={() => setActiveProcess(index)} 
-                  key={number} 
-                  className={styles.processStep}
-                >
-                  <span className={styles.stepNumber}><i /><b />{number}</span>
-                  <strong>{title}</strong>
-                </button>
-              ))}
+        <section id="process" data-process-track className={styles.processTrack}>
+          <div data-cinematic-section className={styles.processSection}>
+            <div data-reveal className={styles.sectionHead}>
+              <p className={styles.mono}>HOW IT WORKS</p>
+              <h2>From first call<br />to live site</h2>
+            </div>
+            <div data-process-grid className={styles.processGrid}>
+              <span data-process-signal className={styles.processSignal} aria-hidden="true" />
+              <AnimatePresence mode="wait">
+                <motion.aside key={activeProcess} className={styles.processDetail} initial={{ opacity: 0, x: -28, rotateY: -8 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} exit={{ opacity: 0, x: 20, rotateY: 6 }} transition={{ type: "spring", stiffness: 180, damping: 24 }}>
+                  <span>ACTIVE STAGE · {processSteps[activeProcess][0]}</span>
+                  <h3>{processSteps[activeProcess][1]}</h3>
+                  <p>{processSteps[activeProcess][2]}</p>
+                </motion.aside>
+              </AnimatePresence>
+              <div className={styles.processNodes}>
+                {processSteps.map(([number, title], index) => (
+                  <button 
+                    ref={el => { processNodesRef.current[index] = el; }}
+                    data-process-step 
+                    data-active={activeProcess === index} 
+                    aria-pressed={activeProcess === index} 
+                    onClick={() => setActiveProcess(index)} 
+                    key={number} 
+                    className={styles.processStep}
+                  >
+                    <span className={styles.stepNumber}><i /><b /></span>
+                    <strong>{title}</strong>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </section>
