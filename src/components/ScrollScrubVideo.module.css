@@ -31,6 +31,7 @@
   text-transform: uppercase;
   color: #aaa59d;
   opacity: inherit;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .headingOverlay h2 {
@@ -43,6 +44,7 @@
   width: 78%;
   color: var(--ivory);
   opacity: inherit;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 .stage {
@@ -68,8 +70,8 @@
   inset: 0;
   background: radial-gradient(
     ellipse at center,
-    rgba(0, 0, 0, 0) 30%,
-    rgba(0, 0, 0, 0.3) 100%
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.12) 100%
   );
   pointer-events: none;
   z-index: 3;
@@ -114,11 +116,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 15vh;
+  height: 12vh;
   background: linear-gradient(
     to bottom,
     rgba(10, 10, 10, 1) 0%,
-    rgba(10, 10, 10, 0.5) 50%,
+    rgba(10, 10, 10, 0.3) 60%,
     rgba(10, 10, 10, 0) 100%
   );
   pointer-events: none;
@@ -130,11 +132,11 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 15vh;
+  height: 12vh;
   background: linear-gradient(
     to top,
     rgba(10, 10, 10, 1) 0%,
-    rgba(10, 10, 10, 0.5) 50%,
+    rgba(10, 10, 10, 0.3) 60%,
     rgba(10, 10, 10, 0) 100%
   );
   pointer-events: none;
@@ -213,8 +215,8 @@
   .vignette {
     background: radial-gradient(
       ellipse at center,
-      rgba(0, 0, 0, 0) 35%,
-      rgba(0, 0, 0, 0.2) 100%
+      rgba(0, 0, 0, 0) 45%,
+      rgba(0, 0, 0, 0.08) 100%
     );
   }
 
