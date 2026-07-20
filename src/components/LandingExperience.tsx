@@ -71,10 +71,14 @@ export default function LandingExperience() {
   const [videoReady, setVideoReady] = useState(false);
   const [videoSettled, setVideoSettled] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
-  const [activeCapability, setActiveCapability] = useState(1);
+  const [activeCapability, setActiveCapability] = useState(0);
+  const [hoveredCapability, setHoveredCapability] = useState<number | null>(null);
   const [activeProcess, setActiveProcess] = useState(0);
   const [activeFounder, setActiveFounder] = useState(0);
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
+  const processNodesRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const processProgressRef = useRef(0);
+  const processNodesHoverRef = useRef<number[]>(processSteps.map(() => 1));
 
   const enterSite = useCallback(() => {
     setIsSpacePressed(true);
@@ -133,7 +137,57 @@ export default function LandingExperience() {
       setVideoSettled(true);
     }, 6500);
     document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
-    return () => window.clearTimeout(fallback);
+    
+    // Custom requestAnimationFrame loop for process steps
+    let rafId: number;
+    let currentSmoothedProgress = 0;
+    
+    const loop = () => {
+      // Smooth the progress
+      currentSmoothedProgress += (processProgressRef.current - currentSmoothedProgress) * 0.1;
+      
+      const activeIdx = Math.min(processSteps.length - 1, Math.floor(currentSmoothedProgress * processSteps.length));
+      
+      processNodesRef.current.forEach((node, idx) => {
+        if (!node) return;
+        
+        // Handle hover scale natively
+        const isHovered = node.matches(':hover') || node.matches(':focus');
+        const targetHoverScale = isHovered ? 1.09 : 1;
+        processNodesHoverRef.current[idx] += (targetHoverScale - processNodesHoverRef.current[idx]) * 0.15;
+        const hoverScale = processNodesHoverRef.current[idx];
+
+        // Bump function for scroll active state
+        const nodeProgress = (idx + 0.5) / processSteps.length;
+        const diff = Math.abs(currentSmoothedProgress - nodeProgress);
+        const bump = Math.max(0, 1 - (diff * processSteps.length));
+        
+        const y = 5 - bump * 17;
+        const scrollScale = 0.9 + bump * 0.17;
+        const rotateX = bump * -6;
+        const opacity = 0.6 + bump * 0.4;
+        
+        const finalScale = scrollScale * hoverScale;
+        
+        node.style.transform = `translateY(${y}px) scale(${finalScale}) rotateX(${rotateX}deg)`;
+        node.style.opacity = opacity.toString();
+        
+        // Active attribute for glow (GSAP handles the red glow via CSS, or we removed it)
+        const isActive = activeIdx === idx;
+        if (isActive && node.getAttribute('data-active') !== 'true') {
+           node.setAttribute('data-active', 'true');
+        } else if (!isActive && node.getAttribute('data-active') === 'true') {
+           node.setAttribute('data-active', 'false');
+        }
+      });
+      rafId = requestAnimationFrame(loop);
+    };
+    rafId = requestAnimationFrame(loop);
+    
+    return () => {
+      window.clearTimeout(fallback);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useGSAP(() => {
@@ -226,9 +280,7 @@ export default function LandingExperience() {
       scrollTrigger: {
         trigger: "[data-capabilities]",
         start: "top 78%",
-        end: "bottom 32%",
-        scrub: 0.9,
-        onUpdate: ({ progress }) => setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length))),
+        toggleActions: "play none none reverse",
       },
     });
     capabilityTimeline
@@ -265,10 +317,10 @@ export default function LandingExperience() {
 
     gsap.fromTo("[data-process-step]", {
       opacity: 0,
-      clipPath: "inset(100% 0 0 0 round 22px)",
+      clipPath: "inset(100% -20% -20% -20% round 22px)",
     }, {
       opacity: 1,
-      clipPath: "inset(0% 0 0 0 round 22px)",
+      clipPath: "inset(-20% -20% -20% -20% round 22px)",
       stagger: 0.06,
       ease: "none",
       scrollTrigger: { trigger: "[data-process-grid]", start: "top 94%", end: "top 55%", scrub: 0.7 },
@@ -284,7 +336,10 @@ export default function LandingExperience() {
         start: "top 82%",
         end: "bottom 48%",
         scrub: 0.7,
-        onUpdate: ({ progress }) => setActiveProcess(Math.min(processSteps.length - 1, Math.floor(progress * processSteps.length))),
+        onUpdate: (self) => {
+          processProgressRef.current = self.progress;
+          setActiveProcess(Math.min(processSteps.length - 1, Math.floor(self.progress * processSteps.length)));
+        }
       },
     });
 
@@ -476,13 +531,16 @@ export default function LandingExperience() {
             {capabilities.map(([number, title, copy, Icon], index) => (
               <motion.button
                 data-system-node
-                data-active={activeCapability === index}
+                data-active={activeCapability === index || hoveredCapability === index}
                 aria-label={`${title}: ${copy}`}
                 onClick={() => setActiveCapability(index)}
+                onMouseEnter={() => setHoveredCapability(index)}
+                onMouseLeave={() => setHoveredCapability(null)}
+                onFocus={() => setHoveredCapability(index)}
+                onBlur={() => setHoveredCapability(null)}
                 key={number}
                 className={styles.systemNode}
-                animate={activeCapability === index ? { y: -12, scale: 1.07, rotateX: -6, rotateY: index % 2 ? 5 : -5, opacity: 1 } : { y: 5, scale: .91, rotateX: 0, rotateY: 0, opacity: .62 }}
-                whileHover={{ y: -15, scale: 1.09 }}
+                animate={activeCapability === index || hoveredCapability === index ? { y: -12, scale: 1.07, rotateX: -6, rotateY: index % 2 ? 5 : -5, opacity: 1 } : { y: 5, scale: .91, rotateX: 0, rotateY: 0, opacity: .62 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 190, damping: 22 }}
               >
@@ -523,10 +581,18 @@ export default function LandingExperience() {
             </AnimatePresence>
             <div className={styles.processNodes}>
               {processSteps.map(([number, title], index) => (
-                <motion.button data-process-step data-active={activeProcess === index} aria-pressed={activeProcess === index} onClick={() => setActiveProcess(index)} key={number} className={styles.processStep} animate={activeProcess === index ? { y: -12, scale: 1.07, rotateX: -6, opacity: 1 } : { y: 5, scale: .9, rotateX: 0, opacity: .6 }} whileHover={{ y: -15, scale: 1.09 }} whileTap={{ scale: .96 }} transition={{ type: "spring", stiffness: 190, damping: 22 }}>
+                <button 
+                  ref={el => { processNodesRef.current[index] = el; }}
+                  data-process-step 
+                  data-active={activeProcess === index} 
+                  aria-pressed={activeProcess === index} 
+                  onClick={() => setActiveProcess(index)} 
+                  key={number} 
+                  className={styles.processStep}
+                >
                   <span className={styles.stepNumber}><i /><b />{number}</span>
                   <strong>{title}</strong>
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>
