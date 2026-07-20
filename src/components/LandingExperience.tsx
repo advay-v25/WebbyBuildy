@@ -12,15 +12,9 @@ import Link from "next/link";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
+import ScrollScrubVideo from "@/components/ScrollScrubVideo";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const processSteps = [
-  ["01", "Talk", "We learn the idea, the audience, and what success looks like"],
-  ["02", "Proposal", "A clear scope, timeline, and fixed written quote within 48 hours"],
-  ["03", "Build", "A working first draft in days, shaped with you in direct reviews"],
-  ["04", "Launch", "We test, launch, hand over everything, and stay available"],
-] as const;
 
 const founders = [
   ["Aarav", "Aher", "Student at Northeastern University"],
@@ -73,12 +67,8 @@ export default function LandingExperience() {
   const [activeProject, setActiveProject] = useState(0);
   const [activeCapability, setActiveCapability] = useState(0);
   const [hoveredCapability, setHoveredCapability] = useState<number | null>(null);
-  const [activeProcess, setActiveProcess] = useState(0);
   const [activeFounder, setActiveFounder] = useState(0);
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
-  const processNodesRef = useRef<(HTMLButtonElement | null)[]>([]);
-  const processProgressRef = useRef(0);
-  const processNodesHoverRef = useRef<number[]>(processSteps.map(() => 1));
 
   const enterSite = useCallback(() => {
     setIsSpacePressed(true);
@@ -135,56 +125,9 @@ export default function LandingExperience() {
       setVideoReady(true);
     }, 6500);
     document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
-    
-    // Custom requestAnimationFrame loop for process steps
-    let rafId: number;
-    let currentSmoothedProgress = 0;
-    
-    const loop = () => {
-      // Smooth the progress
-      currentSmoothedProgress += (processProgressRef.current - currentSmoothedProgress) * 0.1;
-      
-      const activeIdx = Math.min(processSteps.length - 1, Math.floor(currentSmoothedProgress * processSteps.length));
-      
-      processNodesRef.current.forEach((node, idx) => {
-        if (!node) return;
-        
-        // Handle hover scale natively
-        const isHovered = node.matches(':hover') || node.matches(':focus');
-        const targetHoverScale = isHovered ? 1.09 : 1;
-        processNodesHoverRef.current[idx] += (targetHoverScale - processNodesHoverRef.current[idx]) * 0.15;
-        const hoverScale = processNodesHoverRef.current[idx];
 
-        // Bump function for scroll active state
-        const nodeProgress = (idx + 0.5) / processSteps.length;
-        const diff = Math.abs(currentSmoothedProgress - nodeProgress);
-        const bump = Math.max(0, 1 - (diff * processSteps.length));
-        
-        const y = 5 - bump * 17;
-        const scrollScale = 0.9 + bump * 0.17;
-        const rotateX = bump * -6;
-        const opacity = 0.6 + bump * 0.4;
-        
-        const finalScale = scrollScale * hoverScale;
-        
-        node.style.transform = `translateY(${y}px) scale(${finalScale}) rotateX(${rotateX}deg)`;
-        node.style.opacity = opacity.toString();
-        
-        // Active attribute for glow (GSAP handles the red glow via CSS, or we removed it)
-        const isActive = activeIdx === idx;
-        if (isActive && node.getAttribute('data-active') !== 'true') {
-           node.setAttribute('data-active', 'true');
-        } else if (!isActive && node.getAttribute('data-active') === 'true') {
-           node.setAttribute('data-active', 'false');
-        }
-      });
-      rafId = requestAnimationFrame(loop);
-    };
-    rafId = requestAnimationFrame(loop);
-    
     return () => {
       window.clearTimeout(fallback);
-      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -324,33 +267,6 @@ export default function LandingExperience() {
       });
     });
 
-    gsap.fromTo("[data-process-step]", {
-      opacity: 0,
-      clipPath: "inset(100% -20% -20% -20% round 22px)",
-    }, {
-      opacity: 1,
-      clipPath: "inset(-20% -20% -20% -20% round 22px)",
-      stagger: 0.06,
-      ease: "none",
-      scrollTrigger: { trigger: "[data-process-grid]", start: "top 94%", end: "top 55%", scrub: 0.7 },
-    });
-
-    const processSignalFrom = window.innerWidth <= 800 ? { scaleY: 0 } : { scaleX: 0 };
-    const processSignalTo = window.innerWidth <= 800 ? { scaleY: 1 } : { scaleX: 1 };
-    gsap.fromTo("[data-process-signal]", processSignalFrom, {
-      ...processSignalTo,
-      ease: "none",
-      scrollTrigger: {
-        trigger: "[data-process-track]",
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => {
-          processProgressRef.current = self.progress;
-          setActiveProcess(Math.min(processSteps.length - 1, Math.floor(self.progress * processSteps.length)));
-        }
-      },
-    });
 
     gsap.fromTo("[data-founder-panel]", {
       opacity: 0,
@@ -580,39 +496,8 @@ export default function LandingExperience() {
           <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
         </section>
 
-        <section id="process" data-process-track className={styles.processTrack}>
-          <div data-cinematic-section className={styles.processSection}>
-            <div data-reveal className={styles.sectionHead}>
-              <p className={styles.mono}>HOW IT WORKS</p>
-              <h2>From first call<br />to live site</h2>
-            </div>
-            <div data-process-grid className={styles.processGrid}>
-              <span data-process-signal className={styles.processSignal} aria-hidden="true" />
-              <AnimatePresence mode="wait">
-                <motion.aside key={activeProcess} className={styles.processDetail} initial={{ opacity: 0, x: -28, rotateY: -8 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} exit={{ opacity: 0, x: 20, rotateY: 6 }} transition={{ type: "spring", stiffness: 180, damping: 24 }}>
-                  <span>ACTIVE STAGE · {processSteps[activeProcess][0]}</span>
-                  <h3>{processSteps[activeProcess][1]}</h3>
-                  <p>{processSteps[activeProcess][2]}</p>
-                </motion.aside>
-              </AnimatePresence>
-              <div className={styles.processNodes}>
-                {processSteps.map(([number, title], index) => (
-                  <button 
-                    ref={el => { processNodesRef.current[index] = el; }}
-                    data-process-step 
-                    data-active={activeProcess === index} 
-                    aria-pressed={activeProcess === index} 
-                    onClick={() => setActiveProcess(index)} 
-                    key={number} 
-                    className={styles.processStep}
-                  >
-                    <span className={styles.stepNumber}><i /><b /></span>
-                    <strong>{title}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+        <section id="process" className={styles.howItWorksSection}>
+          <ScrollScrubVideo />
         </section>
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebbyBuildy Tools & Libraries</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0f0f0f;
+        color: #e0e0e0;
+      }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+      border-bottom: 2px solid #c9a96e;
+      padding-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #1a1a1a;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      h1 {
+        color: #ffffff;
+      }
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #666;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .subtitle {
+        color: #aaa;
+      }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .card {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 24px;
+      background: #f9f9f9;
+      transition: all 200ms ease-out;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .card {
+        background: #1a1a1a;
+        border-color: #333;
+      }
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .card:hover {
+        box-shadow: 0 4px 12px rgba(201, 169, 110, 0.2);
+      }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .icon {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .card h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .category {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+      background: #c9a96e;
+      color: white;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .description {
+        color: #aaa;
+      }
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 12px;
+    }
+
+    .features li {
+      font-size: 14px;
+      padding: 4px 0;
+      padding-left: 20px;
+      position: relative;
+      color: #666;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .features li {
+        color: #999;
+      }
+    }
+
+    .features li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #c9a96e;
+      font-weight: 600;
+    }
+
+    .status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .status.installed {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .status.installed {
+        background: #1e4620;
+        color: #4caf50;
+      }
+    }
+
+    .status.available {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .status.available {
+        background: #0a2e3a;
+        color: #81d4fa;
+      }
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 600;
+      margin: 40px 0 24px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #c9a96e;
+    }
+
+    .quick-reference {
+      background: #f5f5f5;
+      border-left: 4px solid #c9a96e;
+      padding: 24px;
+      border-radius: 4px;
+      margin: 40px 0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .quick-reference {
+        background: #1a1a1a;
+      }
+    }
+
+    .quick-reference h3 {
+      margin-bottom: 12px;
+    }
+
+    .reference-table {
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .reference-table tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .reference-table tr {
+        border-bottom-color: #333;
+      }
+    }
+
+    .reference-table td {
+      padding: 12px 0;
+      padding-right: 16px;
+    }
+
+    .reference-table td:first-child {
+      font-weight: 500;
+      color: #c9a96e;
+      min-width: 100px;
+    }
+
+    .footnote {
+      font-size: 12px;
+      color: #999;
+      margin-top: 20px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .footnote {
+        color: #666;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🛠️ WebbyBuildy Tools & Libraries</h1>
+      <p class="subtitle">Complete reference of all animation, design, and development tools</p>
+    </header>
+
+    <h2 class="section-title">Animation Libraries (NPM)</h2>
+    <p style="margin-bottom: 24px; color: #666;">All already installed and ready to use in your project</p>
+
+    <div class="grid">
+      <!-- GSAP -->
+      <div class="card">
+        <div class="category">Animation</div>
+        <div class="card-header">
+          <div class="icon">⚡</div>
+          <h2>GSAP</h2>
+        </div>
+        <p class="description">High-performance animation library with ScrollTrigger plugin</p>
+        <ul class="features">
+          <li>20x faster than jQuery</li>
+          <li>Scroll-driven animations</li>
+          <li>Complex timelines</li>
+          <li>SVG morphing</li>
+          <li>Works with Three.js</li>
+        </ul>
+        <span class="status installed">✓ Installed v3.15.0</span>
+        <span class="status installed" style="margin-left: 8px;">✓ React integration</span>
+      </div>
+
+      <!-- Framer Motion -->
+      <div class="card">
+        <div class="category">Animation</div>
+        <div class="card-header">
+          <div class="icon">🎬</div>
+          <h2>Framer Motion</h2>
+        </div>
+        <p class="description">React animation library with gesture controls and springs</p>
+        <ul class="features">
+          <li>Spring physics animations</li>
+          <li>Gesture controls (drag, hover, tap)</li>
+          <li>Declarative API</li>
+          <li>Layout animations</li>
+          <li>Micro-interactions</li>
+        </ul>
+        <span class="status installed">✓ Installed v12.42.2</span>
+      </div>
+
+      <!-- Lenis -->
+      <div class="card">
+        <div class="category">Scrolling</div>
+        <div class="card-header">
+          <div class="icon">↓</div>
+          <h2>Lenis</h2>
+        </div>
+        <p class="description">Lightweight smooth scrolling with WebGL/parallax sync</p>
+        <ul class="features">
+          <li>Zero dependencies</li>
+          <li>Smooth scroll behavior</li>
+          <li>WebGL sync capable</li>
+          <li>Parallax support</li>
+          <li>Preserves native features</li>
+        </ul>
+        <span class="status installed">✓ Installed v1.3.25</span>
+      </div>
+
+      <!-- Anime.js -->
+      <div class="card">
+        <div class="category">Animation</div>
+        <div class="card-header">
+          <div class="icon">🎨</div>
+          <h2>Anime.js</h2>
+        </div>
+        <p class="description">Lightweight animation library for simple tweens</p>
+        <ul class="features">
+          <li>Small bundle size (~10KB)</li>
+          <li>Simple API</li>
+          <li>SVG animations</li>
+          <li>CSS & DOM support</li>
+          <li>Property morphing</li>
+        </ul>
+        <span class="status installed">✓ Installed v4.5.0</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">Design & Code Quality Skills</h2>
+    <p style="margin-bottom: 24px; color: #666;">Cloned to .references/ for learning and integration</p>
+
+    <div class="grid">
+      <!-- Impeccable -->
+      <div class="card">
+        <div class="category">Design System</div>
+        <div class="card-header">
+          <div class="icon">✨</div>
+          <h2>Impeccable</h2>
+        </div>
+        <p class="description">Design guidance system with 23 commands and deterministic rules</p>
+        <ul class="features">
+          <li>23 design commands</li>
+          <li>Deterministic detector rules</li>
+          <li>One-time setup flow</li>
+          <li>Live preview iteration</li>
+          <li>Design system docs</li>
+        </ul>
+        <span class="status available">✓ Available in .references/</span>
+      </div>
+
+      <!-- Taste Skill -->
+      <div class="card">
+        <div class="category">Design System</div>
+        <div class="card-header">
+          <div class="icon">👨‍🎨</div>
+          <h2>Taste Skill</h2>
+        </div>
+        <p class="description">Anti-slop frontend framework preventing AI boilerplate UI</p>
+        <ul class="features">
+          <li>Layout patterns</li>
+          <li>Typography rules</li>
+          <li>Motion guidelines</li>
+          <li>Spacing system</li>
+          <li>Image generation skills</li>
+        </ul>
+        <span class="status available">✓ Available in .references/</span>
+      </div>
+
+      <!-- UI/UX Pro Max -->
+      <div class="card">
+        <div class="category">Design System</div>
+        <div class="card-header">
+          <div class="icon">🎯</div>
+          <h2>UI/UX Pro Max</h2>
+        </div>
+        <p class="description">AI design system generator with 161 reasoning rules</p>
+        <ul class="features">
+          <li>161 reasoning rules</li>
+          <li>84 pre-built UI styles</li>
+          <li>Color palette generation</li>
+          <li>Typography recommendations</li>
+          <li>Pre-delivery checklist</li>
+        </ul>
+        <span class="status available">✓ Available in .references/</span>
+      </div>
+
+      <!-- Caveman -->
+      <div class="card">
+        <div class="category">Developer Experience</div>
+        <div class="card-header">
+          <div class="icon">🪨</div>
+          <h2>Caveman Skill</h2>
+        </div>
+        <p class="description">Makes Claude drop filler for terse, efficient responses</p>
+        <ul class="features">
+          <li>65% fewer output tokens</li>
+          <li>Terse response style</li>
+          <li>Keeps code exact</li>
+          <li>Multiple terseness levels</li>
+          <li>Works with 30+ agents</li>
+        </ul>
+        <span class="status available">✓ Available in .references/</span>
+      </div>
+    </div>
+
+    <div class="quick-reference">
+      <h3>Quick Decision Guide: Which Animation Library to Use?</h3>
+      <table class="reference-table">
+        <tr>
+          <td><strong>Use Case</strong></td>
+          <td><strong>Library</strong></td>
+          <td><strong>Why</strong></td>
+        </tr>
+        <tr>
+          <td>Scroll reveal</td>
+          <td>GSAP ScrollTrigger</td>
+          <td>Most control, best performance for scroll-driven</td>
+        </tr>
+        <tr>
+          <td>Button hover effect</td>
+          <td>Framer Motion</td>
+          <td>Spring physics feel, declarative React API</td>
+        </tr>
+        <tr>
+          <td>Parallax on scroll</td>
+          <td>GSAP + Lenis</td>
+          <td>Lenis drives smooth scroll, GSAP animates elements</td>
+        </tr>
+        <tr>
+          <td>Page transitions</td>
+          <td>Framer Motion</td>
+          <td>layoutId and shared animations, route-aware</td>
+        </tr>
+        <tr>
+          <td>SVG morphing</td>
+          <td>GSAP or Anime</td>
+          <td>Anime lighter, GSAP more control</td>
+        </tr>
+        <tr>
+          <td>Loading bar/counter</td>
+          <td>Anime.js</td>
+          <td>Lightweight, simple API, no overhead</td>
+        </tr>
+        <tr>
+          <td>Complex timeline</td>
+          <td>GSAP</td>
+          <td>Timeline API with precise sequence control</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2 class="section-title">Design Documents Created</h2>
+
+    <div class="quick-reference">
+      <h3>📋 PRODUCT.md</h3>
+      <p><strong>Brand & Product Context</strong></p>
+      <ul class="features" style="margin-top: 12px;">
+        <li>Target audience: Design-conscious tech enthusiasts</li>
+        <li>Product lane: Premium brand/showcase</li>
+        <li>Voice: Sophisticated, detail-oriented, refined</li>
+        <li>Anti-references: Generic e-commerce, startup templates</li>
+        <li>Success metrics: Immersion, smooth animations, premium feel</li>
+      </ul>
+    </div>
+
+    <div class="quick-reference">
+      <h3>🎨 DESIGN.md</h3>
+      <p><strong>Visual & Interaction System</strong></p>
+      <ul class="features" style="margin-top: 12px;">
+        <li>Colors: Deep black (#1a1a1a) + warm bronze (#c9a96e)</li>
+        <li>Typography: Cormorant Garamond (headings) + Inter (body)</li>
+        <li>Spacing: 8px grid system with defined scale</li>
+        <li>Animations: Spring easing, 150-500ms duration</li>
+        <li>Accessibility: WCAG AA, 4.5:1 contrast, keyboard nav</li>
+      </ul>
+    </div>
+
+    <h2 class="section-title">What's in .references/</h2>
+
+    <div class="quick-reference">
+      <p style="margin: 0;">All cloned repositories for learning and reference:</p>
+      <table class="reference-table" style="margin-top: 16px;">
+        <tr>
+          <td><strong>.references/lenis/</strong></td>
+          <td>Smooth scrolling library source & examples</td>
+        </tr>
+        <tr>
+          <td><strong>.references/GSAP/</strong></td>
+          <td>GSAP full documentation & plugins</td>
+        </tr>
+        <tr>
+          <td><strong>.references/framer-motion/</strong></td>
+          <td>Framer Motion learning examples</td>
+        </tr>
+        <tr>
+          <td><strong>.references/ui-ux-pro-max-skill/</strong></td>
+          <td>Design system generator & reasoning rules</td>
+        </tr>
+        <tr>
+          <td><strong>.references/impeccable/</strong></td>
+          <td>Design commands documentation</td>
+        </tr>
+        <tr>
+          <td><strong>.references/taste-skill/</strong></td>
+          <td>Anti-slop patterns & research</td>
+        </tr>
+        <tr>
+          <td><strong>.references/caveman/</strong></td>
+          <td>Terse output skill setup guides</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2 class="section-title">Claude Memory Created</h2>
+
+    <div class="quick-reference">
+      <p style="margin: 0;">All knowledge saved for future sessions at <code>.claude/projects/.../memory/</code>:</p>
+      <table class="reference-table" style="margin-top: 16px;">
+        <tr>
+          <td><strong>lib_lenis.md</strong></td>
+          <td>Smooth scrolling patterns & integration</td>
+        </tr>
+        <tr>
+          <td><strong>lib_gsap.md</strong></td>
+          <td>GSAP animations & React usage</td>
+        </tr>
+        <tr>
+          <td><strong>lib_framer_motion.md</strong></td>
+          <td>Framer Motion gestures & springs</td>
+        </tr>
+        <tr>
+          <td><strong>lib_anime.md</strong></td>
+          <td>Anime.js lightweight tweens</td>
+        </tr>
+        <tr>
+          <td><strong>design_impeccable.md</strong></td>
+          <td>Design commands & setup workflow</td>
+        </tr>
+        <tr>
+          <td><strong>design_ui_ux_pro_max.md</strong></td>
+          <td>Design system generation</td>
+        </tr>
+        <tr>
+          <td><strong>skill_taste.md</strong></td>
+          <td>Anti-slop UI patterns</td>
+        </tr>
+        <tr>
+          <td><strong>skill_caveman.md</strong></td>
+          <td>Terse output configuration</td>
+        </tr>
+        <tr>
+          <td><strong>integration_guide.md</strong></td>
+          <td>Complete integration & patterns</td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin: 60px 0 20px 0; padding-top: 20px; border-top: 2px solid #c9a96e;">
+      <h3>📌 Key Takeaways</h3>
+      <ul class="features">
+        <li><strong>All NPM packages installed</strong> — GSAP, Framer Motion, Lenis, Anime.js ready to use</li>
+        <li><strong>Design system locked in</strong> — PRODUCT.md & DESIGN.md define voice, colors, typography, animations</li>
+        <li><strong>Reference materials available</strong> — Clone all 7 skill repos in .references/ for learning</li>
+        <li><strong>Claude memory persistent</strong> — Future sessions have full context about libraries, patterns, anti-patterns</li>
+        <li><strong>Decision guide provided</strong> — Know which library to use for each animation scenario</li>
+      </ul>
+      <p class="footnote">All tools are documented in LIBRARIES.md and MEMORY.md for quick reference</p>
+    </div>
+  </div>
+</body>
+</html>
