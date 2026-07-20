@@ -65,11 +65,11 @@ export default function LandingExperience() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLElement>(null);
   const introVideo = useRef<HTMLVideoElement>(null);
+  const pressVideo = useRef<HTMLVideoElement>(null);
   const spaceKey = useRef<HTMLSpanElement>(null);
   const lenis = useLenis(() => ScrollTrigger.update());
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const [videoSettled, setVideoSettled] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
   const [activeCapability, setActiveCapability] = useState(1);
   const [activeProcess, setActiveProcess] = useState(0);
@@ -78,8 +78,6 @@ export default function LandingExperience() {
 
   const enterSite = useCallback(() => {
     setIsSpacePressed(true);
-    setVideoSettled(true);
-    introVideo.current?.pause();
     if (spaceKey.current) {
       animate(spaceKey.current, {
         translateY: [0, 7, 0],
@@ -101,6 +99,7 @@ export default function LandingExperience() {
     });
     if (!lenis) window.scrollTo({ top: destination });
     window.setTimeout(() => setIsSpacePressed(false), 1450);
+    window.setTimeout(() => introVideo.current?.pause(), reducedMotion ? 0 : 4300);
   }, [lenis]);
 
   const moveProject = useCallback((direction: -1 | 1) => {
@@ -130,7 +129,6 @@ export default function LandingExperience() {
 
     const fallback = window.setTimeout(() => {
       setVideoReady(true);
-      setVideoSettled(true);
     }, 6500);
     document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
     return () => window.clearTimeout(fallback);
@@ -164,15 +162,26 @@ export default function LandingExperience() {
       },
     });
     heroTimeline
+      // Establishing shot fades out as the copy clears the frame.
       .to("[data-hero-copy-wrap]", { opacity: 0, y: -64, duration: 0.18, ease: "power2.in" }, 0.04)
       .to("[data-space-prompt]", { opacity: 0, y: 22, duration: 0.12, ease: "power2.in" }, 0.03)
-      .to("[data-keyboard-idle]", { scale: 1.035, rotateX: -2, opacity: 0, duration: 0.22, ease: "power2.inOut" }, 0.02)
-      .fromTo("[data-keyboard-pressed]", { opacity: 0, scale: 1 }, { opacity: 1, scale: 1.035, rotateX: -2, duration: 0.18, ease: "power2.out" }, 0.02)
-      .set("[data-keyboard-fragment]", { opacity: 1 }, 0.1)
-      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.34, ease: "power3.inOut" }, 0.14)
-      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 0.26, ease: "power2.out" }, 0.27)
-      .fromTo("[data-curtain-copy]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" }, 0.3)
-      .to(hero.current, { "--hero-shade-opacity": 0, duration: 0.24, ease: "power1.out" }, 0.3)
+      // Beat 1: a light burst masks the cut from the looping ambient shot to the press-reaction clip -- same
+      // camera angle as the loop, so the dissolve reads as one continuous take, not a cut.
+      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "power1.in" }, 0.015)
+      .to(introVideo.current, { opacity: 0, duration: 0.07, ease: "power2.in" }, 0.03)
+      .fromTo("[data-press-video]", { opacity: 0 }, { opacity: 1, duration: 0.07, ease: "power2.out" }, 0.035)
+      .call(() => { pressVideo.current?.play().catch(() => undefined); }, [], 0.035)
+      .to("[data-hero-flash]", { opacity: 0, duration: 0.09, ease: "power2.out" }, 0.09)
+      // Beat 2: the press clip plays its light burst and glow settle in real time; once it's had room to
+      // land, crossfade to a matching still (extracted from the same clip) so the shatter has a stable frame.
+      .to("[data-press-video]", { opacity: 0, duration: 0.045, ease: "power1.in" }, 0.42)
+      .fromTo("[data-keyboard-pressed]", { opacity: 0, scale: 1.012 }, { opacity: 1, scale: 1.006, duration: 0.11, ease: "power2.out" }, 0.425)
+      .set("[data-keyboard-fragment]", { opacity: 1 }, 0.46)
+      // Beat 3: the keyboard shatters, the curtain rises.
+      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.3, ease: "power3.inOut" }, 0.48)
+      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 0.2, ease: "power2.out" }, 0.6)
+      .fromTo("[data-curtain-copy]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out" }, 0.62)
+      .to(hero.current, { "--hero-shade-opacity": 0, duration: 0.2, ease: "power1.out" }, 0.62)
       .to("[data-keyboard-fragment]", {
         xPercent: (index) => {
           const column = index % 7;
@@ -190,11 +199,11 @@ export default function LandingExperience() {
         filter: "blur(10px)",
         opacity: 0,
         stagger: { amount: 0.18, from: "center" },
-        duration: 0.48,
+        duration: 0.32,
         ease: "power3.inOut",
-      }, 0.2)
-      .to("[data-keyboard-pressed]", { opacity: 0, duration: 0.18 }, 0.44)
-      .to("[data-curtain-copy]", { y: -18, duration: 0.3, ease: "none" }, 0.7);
+      }, 0.48)
+      .to("[data-keyboard-pressed]", { opacity: 0, duration: 0.16 }, 0.52)
+      .to("[data-curtain-copy]", { y: -18, duration: 0.2, ease: "none" }, 0.8);
 
     ([
       ["#top", "top"],
@@ -370,23 +379,28 @@ export default function LandingExperience() {
           <div className={styles.heroMedia} aria-hidden="true">
             <video
               ref={introVideo}
-              className={`${styles.heroVideo} ${videoReady ? styles.heroVideoReady : ""} ${videoSettled ? styles.heroVideoSettled : ""}`}
+              className={`${styles.heroVideo} ${videoReady ? styles.heroVideoReady : ""}`}
               autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/hero/keyboard-loop-poster.jpg"
+              onCanPlay={() => setVideoReady(true)}
+            >
+              <source src="/hero/keyboard-loop.mp4" type="video/mp4" />
+            </video>
+            <video
+              ref={pressVideo}
+              data-press-video
+              className={styles.heroVideoPress}
               muted
               playsInline
               preload="auto"
-              poster="/hero/keyboard-poster.jpg"
-              onCanPlay={() => setVideoReady(true)}
-              onTimeUpdate={(event) => {
-                if (event.currentTarget.currentTime >= 4 && !videoSettled) setVideoSettled(true);
-                if (event.currentTarget.currentTime >= 4.75) event.currentTarget.pause();
-              }}
-              onEnded={() => setVideoSettled(true)}
             >
-              <source src="/hero/keyboard-pullback-real.mp4" type="video/mp4" />
+              <source src="/hero/keyboard-press-glow.mp4" type="video/mp4" />
             </video>
-            <div data-keyboard-idle className={`${styles.keyboardIdle} ${videoSettled ? styles.keyboardIdleVisible : ""}`} />
-            <div data-keyboard-pressed className={`${styles.keyboardPressed} ${isSpacePressed ? styles.keyboardPressedActive : ""}`} />
+            <div data-keyboard-pressed className={styles.keyboardPressed} />
             <div className={styles.keyboardFragments}>
               {keyboardFragments.map(({ index, column, row, clipPath }) => (
                 <i
@@ -396,6 +410,7 @@ export default function LandingExperience() {
                 />
               ))}
             </div>
+            <div data-hero-flash className={styles.heroFlash} />
           </div>
 
           <button data-space-prompt className={`${styles.spacePrompt} ${isSpacePressed ? styles.spacePressed : ""}`} onClick={enterSite}>
