@@ -582,7 +582,7 @@ export default function LandingExperience() {
             <div className={styles.processNodes}>
               {processSteps.map(([number, title], index) => (
                 <button 
-                  ref={el => processNodesRef.current[index] = el}
+                  ref={el => { processNodesRef.current[index] = el; }}
                   data-process-step 
                   data-active={activeProcess === index} 
                   aria-pressed={activeProcess === index} 
