@@ -46,9 +46,11 @@ export default function ScrollScrubVideo() {
 
   // Detect touch device
   useEffect(() => {
-    setIsTouchDevice(() =>
-      window.matchMedia("(hover: none) and (pointer: coarse)").matches
-    );
+    requestAnimationFrame(() => {
+      setIsTouchDevice(
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches
+      );
+    });
   }, []);
 
   // Cursor parallax (desktop only)
@@ -203,7 +205,6 @@ export default function ScrollScrubVideo() {
 
               // Heading animation: reveal on entry, recede after ~15%
               if (heading) {
-                const headingRevealProgress = Math.min(progress / 0.08, 1);
                 const headingRecedeProgress = Math.max((progress - 0.15) / 0.25, 0);
 
                 const headingOpacity = 1 - headingRecedeProgress;
