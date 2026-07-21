@@ -22,11 +22,56 @@ const founders = [
   ["Advay", "Vaidya", "CFA aspirant"],
 ] as const;
 
+const DesigningIcon = (props: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <g transform="scale(0.7) translate(2, 2)">
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+      <rect x="9" y="9" width="6" height="6"></rect>
+      <line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line>
+    </g>
+    <g transform="scale(0.6) translate(16, 16)">
+      <path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path>
+      <path d="M17.64 15L22 10.64"></path>
+      <path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"></path>
+    </g>
+  </svg>
+);
+
+const RefiningIcon = (props: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <g transform="scale(0.65) translate(1, 9)">
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+      <rect x="9" y="9" width="6" height="6"></rect>
+      <line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line>
+    </g>
+    <g transform="scale(0.9) translate(9, -2)">
+      <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path>
+      <path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z" fill="white"></path>
+      <path d="M4 2v4m-2-2h4" strokeWidth="1.5" />
+    </g>
+  </svg>
+);
+
+const DeliveryIcon = (props: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <g transform="scale(0.8) translate(3, 4)">
+      <polyline points="20 12 20 22 4 22 4 12"></polyline>
+      <rect x="2" y="7" width="20" height="5"></rect>
+      <line x1="12" y1="22" x2="12" y2="7"></line>
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+    </g>
+    <path d="M4 2v4m-2-2h4" strokeWidth="1.5" />
+    <path d="M20 5v4m-2-2h4" strokeWidth="1.5" />
+    <path d="M19 16v4m-2-2h4" strokeWidth="1.5" />
+  </svg>
+);
+
 const capabilities = [
-  ["01", "Direction", "Clarity before pixels", Compass],
-  ["02", "Design", "Beautiful, useful, on-brand", PenTool],
-  ["03", "Development", "Fast, scalable, future-ready", Braces],
-  ["04", "Motion", "Meaning in every movement", Orbit],
+  ["01", "Direction", "Grasping what to make before starting - your requirements, specifics, even just the feel you want to bring to your website", Compass],
+  ["02", "Designing", "Turning your demands into tangible realities as we build your perfect website", DesigningIcon],
+  ["03", "Refining", "Any changes or improvements you may want, all the way down to the smallest intricacies, made without any hassle", RefiningIcon],
+  ["04", "Delivery", "Delivering your ideal website to you, ready for use by your own clients", DeliveryIcon],
 ] as const;
 
 const projects = [
@@ -459,10 +504,12 @@ export default function LandingExperience() {
         </section>
 
         <section data-capabilities data-cinematic-section className={styles.capabilitiesSection}>
-          <div className={styles.capabilitiesCopy} data-capability-copy>
-            <p className={styles.mono}>ONE CONTINUOUS SYSTEM</p>
-            <h2>From a spark to a<br />site people <em>remember</em></h2>
-            <p>Strategy, design, development and motion—built as one continuous system</p>
+          <div className={styles.capabilitiesLeft}>
+            <div className={styles.capabilitiesCopy} data-capability-copy>
+              <p className={styles.mono}>ONE CONTINUOUS SYSTEM</p>
+              <h2>From a spark to a<br />site people <em>remember</em></h2>
+            </div>
+            <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
           </div>
           <div className={styles.systemStage}>
             <div className={styles.systemRail} aria-hidden="true"><i /></div>
@@ -501,7 +548,6 @@ export default function LandingExperience() {
               <path data-energy-path pathLength="1" d="M-40 370 C90 340 120 288 230 300 S350 250 440 254 S540 195 625 208 S740 118 805 142 S920 60 1040 28" />
             </svg>
           </div>
-          <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
         </section>
 
         <section id="process" className={styles.howItWorksSection}>
