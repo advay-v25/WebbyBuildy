@@ -1,0 +1,262 @@
+.track {
+  position: relative;
+  height: 500vh;
+  background: linear-gradient(180deg, #050505, #090808);
+}
+
+.videoPanel {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  will-change: transform;
+  /* ScrollTrigger will handle pinning via transform */
+}
+
+.headingOverlay {
+  position: absolute;
+  top: clamp(2rem, 6vh, 6rem);
+  left: var(--gutter);
+  right: var(--gutter);
+  z-index: 10;
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+}
+
+.headingOverlay p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #aaa59d;
+  opacity: inherit;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.headingOverlay h2 {
+  font-family: var(--font-display);
+  font-size: clamp(3.8rem, 6.7vw, 7.4rem);
+  font-weight: 600;
+  line-height: 0.87;
+  letter-spacing: -0.068em;
+  margin: 0;
+  width: 78%;
+  color: var(--ivory);
+  opacity: inherit;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.videoElement {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  will-change: opacity;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 400px 400px;
+  background-position: 0 0;
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: overlay;
+  will-change: background-position;
+}
+
+.letterboxTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #000;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.letterboxBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #000;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.gradientTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12vh;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 1) 0%,
+    rgba(10, 10, 10, 0.3) 60%,
+    rgba(10, 10, 10, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 6;
+}
+
+.gradientBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12vh;
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 10, 1) 0%,
+    rgba(10, 10, 10, 0.3) 60%,
+    rgba(10, 10, 10, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 6;
+}
+
+.loadingPlaceholder {
+  position: absolute;
+  inset: 0;
+  background: #1a1a1a;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Reduced motion variant */
+.sectionReducedMotion {
+  position: relative;
+  background: linear-gradient(180deg, #050505, #090808);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoContainerReducedMotion {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.videoContainerReducedMotion .videoElement {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile styles */
+@media (max-width: 800px) {
+  .track {
+    height: 300vh;
+  }
+
+  .videoPanel {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .headingOverlay {
+    top: clamp(1rem, 4vh, 4rem);
+    left: 20px;
+    right: 20px;
+  }
+
+  .headingOverlay h2 {
+    width: 100%;
+    font-size: clamp(2.5rem, 12vw, 4.5rem);
+  }
+
+  .sectionReducedMotion {
+    min-height: 100vh;
+  }
+
+  /* Reduce cinematic effects on mobile */
+  .vignette {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0) 45%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
+  }
+
+  .grain {
+    opacity: 0 !important;
+  }
+
+  .letterboxTop,
+  .letterboxBottom {
+    /* Reduced letterbox height on mobile */
+  }
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .loadingPlaceholder {
+    animation: none;
+  }
+
+  .stage {
+    will-change: auto;
+  }
+
+  .vignette {
+    opacity: 0 !important;
+  }
+
+  .grain {
+    opacity: 0 !important;
+  }
+
+  .letterboxTop,
+  .letterboxBottom {
+    height: 0 !important;
+  }
+
+  .headingOverlay {
+    will-change: auto;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

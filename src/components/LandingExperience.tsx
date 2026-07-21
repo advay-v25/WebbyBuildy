@@ -12,15 +12,9 @@ import Link from "next/link";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
+import ScrollScrubVideo from "@/components/ScrollScrubVideo";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const processSteps = [
-  ["01", "Talk", "We learn the idea, the audience, and what success looks like"],
-  ["02", "Proposal", "A clear scope, timeline, and fixed written quote within 48 hours"],
-  ["03", "Build", "A working first draft in days, shaped with you in direct reviews"],
-  ["04", "Launch", "We test, launch, hand over everything, and stay available"],
-] as const;
 
 const founders = [
   ["Aarav", "Aher", "Student at Northeastern University"],
@@ -65,25 +59,19 @@ export default function LandingExperience() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLElement>(null);
   const introVideo = useRef<HTMLVideoElement>(null);
+  const pressVideo = useRef<HTMLVideoElement>(null);
   const spaceKey = useRef<HTMLSpanElement>(null);
   const lenis = useLenis(() => ScrollTrigger.update());
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const [videoSettled, setVideoSettled] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
   const [activeCapability, setActiveCapability] = useState(0);
   const [hoveredCapability, setHoveredCapability] = useState<number | null>(null);
-  const [activeProcess, setActiveProcess] = useState(0);
   const [activeFounder, setActiveFounder] = useState(0);
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
-  const processNodesRef = useRef<(HTMLButtonElement | null)[]>([]);
-  const processProgressRef = useRef(0);
-  const processNodesHoverRef = useRef<number[]>(processSteps.map(() => 1));
 
   const enterSite = useCallback(() => {
     setIsSpacePressed(true);
-    setVideoSettled(true);
-    introVideo.current?.pause();
     if (spaceKey.current) {
       animate(spaceKey.current, {
         translateY: [0, 7, 0],
@@ -105,6 +93,7 @@ export default function LandingExperience() {
     });
     if (!lenis) window.scrollTo({ top: destination });
     window.setTimeout(() => setIsSpacePressed(false), 1450);
+    window.setTimeout(() => introVideo.current?.pause(), reducedMotion ? 0 : 4300);
   }, [lenis]);
 
   const moveProject = useCallback((direction: -1 | 1) => {
@@ -142,59 +131,11 @@ export default function LandingExperience() {
 
     const fallback = window.setTimeout(() => {
       setVideoReady(true);
-      setVideoSettled(true);
     }, 6500);
     document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
-    
-    // Custom requestAnimationFrame loop for process steps
-    let rafId: number;
-    let currentSmoothedProgress = 0;
-    
-    const loop = () => {
-      // Smooth the progress
-      currentSmoothedProgress += (processProgressRef.current - currentSmoothedProgress) * 0.1;
-      
-      const activeIdx = Math.min(processSteps.length - 1, Math.floor(currentSmoothedProgress * processSteps.length));
-      
-      processNodesRef.current.forEach((node, idx) => {
-        if (!node) return;
-        
-        // Handle hover scale natively
-        const isHovered = node.matches(':hover') || node.matches(':focus');
-        const targetHoverScale = isHovered ? 1.09 : 1;
-        processNodesHoverRef.current[idx] += (targetHoverScale - processNodesHoverRef.current[idx]) * 0.15;
-        const hoverScale = processNodesHoverRef.current[idx];
 
-        // Bump function for scroll active state
-        const nodeProgress = (idx + 0.5) / processSteps.length;
-        const diff = Math.abs(currentSmoothedProgress - nodeProgress);
-        const bump = Math.max(0, 1 - (diff * processSteps.length));
-        
-        const y = 5 - bump * 17;
-        const scrollScale = 0.9 + bump * 0.17;
-        const rotateX = bump * -6;
-        const opacity = 0.6 + bump * 0.4;
-        
-        const finalScale = scrollScale * hoverScale;
-        
-        node.style.transform = `translateY(${y}px) scale(${finalScale}) rotateX(${rotateX}deg)`;
-        node.style.opacity = opacity.toString();
-        
-        // Active attribute for glow (GSAP handles the red glow via CSS, or we removed it)
-        const isActive = activeIdx === idx;
-        if (isActive && node.getAttribute('data-active') !== 'true') {
-           node.setAttribute('data-active', 'true');
-        } else if (!isActive && node.getAttribute('data-active') === 'true') {
-           node.setAttribute('data-active', 'false');
-        }
-      });
-      rafId = requestAnimationFrame(loop);
-    };
-    rafId = requestAnimationFrame(loop);
-    
     return () => {
       window.clearTimeout(fallback);
-      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -226,15 +167,26 @@ export default function LandingExperience() {
       },
     });
     heroTimeline
+      // Establishing shot fades out as the copy clears the frame.
       .to("[data-hero-copy-wrap]", { opacity: 0, y: -64, duration: 0.18, ease: "power2.in" }, 0.04)
       .to("[data-space-prompt]", { opacity: 0, y: 22, duration: 0.12, ease: "power2.in" }, 0.03)
-      .to("[data-keyboard-idle]", { scale: 1.035, rotateX: -2, opacity: 0, duration: 0.22, ease: "power2.inOut" }, 0.02)
-      .fromTo("[data-keyboard-pressed]", { opacity: 0, scale: 1 }, { opacity: 1, scale: 1.035, rotateX: -2, duration: 0.18, ease: "power2.out" }, 0.02)
-      .set("[data-keyboard-fragment]", { opacity: 1 }, 0.1)
-      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.34, ease: "power3.inOut" }, 0.14)
-      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 0.26, ease: "power2.out" }, 0.27)
-      .fromTo("[data-curtain-copy]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" }, 0.3)
-      .to(hero.current, { "--hero-shade-opacity": 0, duration: 0.24, ease: "power1.out" }, 0.3)
+      // Beat 1: a light burst masks the cut from the looping ambient shot to the press-reaction clip -- same
+      // camera angle as the loop, so the dissolve reads as one continuous take, not a cut.
+      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "power1.in" }, 0.015)
+      .to(introVideo.current, { opacity: 0, duration: 0.07, ease: "power2.in" }, 0.03)
+      .fromTo("[data-press-video]", { opacity: 0 }, { opacity: 1, duration: 0.07, ease: "power2.out" }, 0.035)
+      .call(() => { pressVideo.current?.play().catch(() => undefined); }, [], 0.035)
+      .to("[data-hero-flash]", { opacity: 0, duration: 0.09, ease: "power2.out" }, 0.09)
+      // Beat 2: the press clip plays its light burst and glow settle in real time; once it's had room to
+      // land, crossfade to a matching still (extracted from the same clip) so the shatter has a stable frame.
+      .to("[data-press-video]", { opacity: 0, duration: 0.045, ease: "power1.in" }, 0.42)
+      .fromTo("[data-keyboard-pressed]", { opacity: 0, scale: 1.012 }, { opacity: 1, scale: 1.006, duration: 0.11, ease: "power2.out" }, 0.425)
+      .set("[data-keyboard-fragment]", { opacity: 1 }, 0.46)
+      // Beat 3: the keyboard shatters, the curtain rises.
+      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.3, ease: "power3.inOut" }, 0.48)
+      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 0.2, ease: "power2.out" }, 0.6)
+      .fromTo("[data-curtain-copy]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out" }, 0.62)
+      .to(hero.current, { "--hero-shade-opacity": 0, duration: 0.2, ease: "power1.out" }, 0.62)
       .to("[data-keyboard-fragment]", {
         xPercent: (index) => {
           const column = index % 7;
@@ -252,11 +204,11 @@ export default function LandingExperience() {
         filter: "blur(10px)",
         opacity: 0,
         stagger: { amount: 0.18, from: "center" },
-        duration: 0.48,
+        duration: 0.32,
         ease: "power3.inOut",
-      }, 0.2)
-      .to("[data-keyboard-pressed]", { opacity: 0, duration: 0.18 }, 0.44)
-      .to("[data-curtain-copy]", { y: -18, duration: 0.3, ease: "none" }, 0.7);
+      }, 0.48)
+      .to("[data-keyboard-pressed]", { opacity: 0, duration: 0.16 }, 0.52)
+      .to("[data-curtain-copy]", { y: -18, duration: 0.2, ease: "none" }, 0.8);
 
     ([
       ["#top", "top"],
@@ -323,33 +275,6 @@ export default function LandingExperience() {
       });
     });
 
-    gsap.fromTo("[data-process-step]", {
-      opacity: 0,
-      clipPath: "inset(100% -20% -20% -20% round 22px)",
-    }, {
-      opacity: 1,
-      clipPath: "inset(-20% -20% -20% -20% round 22px)",
-      stagger: 0.06,
-      ease: "none",
-      scrollTrigger: { trigger: "[data-process-grid]", start: "top 94%", end: "top 55%", scrub: 0.7 },
-    });
-
-    const processSignalFrom = window.innerWidth <= 800 ? { scaleY: 0 } : { scaleX: 0 };
-    const processSignalTo = window.innerWidth <= 800 ? { scaleY: 1 } : { scaleX: 1 };
-    gsap.fromTo("[data-process-signal]", processSignalFrom, {
-      ...processSignalTo,
-      ease: "none",
-      scrollTrigger: {
-        trigger: "[data-process-grid]",
-        start: "top 82%",
-        end: "bottom 48%",
-        scrub: 0.7,
-        onUpdate: (self) => {
-          processProgressRef.current = self.progress;
-          setActiveProcess(Math.min(processSteps.length - 1, Math.floor(self.progress * processSteps.length)));
-        }
-      },
-    });
 
     gsap.fromTo("[data-founder-panel]", {
       opacity: 0,
@@ -433,23 +358,28 @@ export default function LandingExperience() {
           <div className={styles.heroMedia} aria-hidden="true">
             <video
               ref={introVideo}
-              className={`${styles.heroVideo} ${videoReady ? styles.heroVideoReady : ""} ${videoSettled ? styles.heroVideoSettled : ""}`}
+              className={`${styles.heroVideo} ${videoReady ? styles.heroVideoReady : ""}`}
               autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/hero/keyboard-loop-poster.jpg"
+              onCanPlay={() => setVideoReady(true)}
+            >
+              <source src="/hero/keyboard-loop.mp4" type="video/mp4" />
+            </video>
+            <video
+              ref={pressVideo}
+              data-press-video
+              className={styles.heroVideoPress}
               muted
               playsInline
               preload="auto"
-              poster="/hero/keyboard-poster.jpg"
-              onCanPlay={() => setVideoReady(true)}
-              onTimeUpdate={(event) => {
-                if (event.currentTarget.currentTime >= 4 && !videoSettled) setVideoSettled(true);
-                if (event.currentTarget.currentTime >= 4.75) event.currentTarget.pause();
-              }}
-              onEnded={() => setVideoSettled(true)}
             >
-              <source src="/hero/keyboard-pullback-real.mp4" type="video/mp4" />
+              <source src="/hero/keyboard-press-glow.mp4" type="video/mp4" />
             </video>
-            <div data-keyboard-idle className={`${styles.keyboardIdle} ${videoSettled ? styles.keyboardIdleVisible : ""}`} />
-            <div data-keyboard-pressed className={`${styles.keyboardPressed} ${isSpacePressed ? styles.keyboardPressedActive : ""}`} />
+            <div data-keyboard-pressed className={styles.keyboardPressed} />
             <div className={styles.keyboardFragments}>
               {keyboardFragments.map(({ index, column, row, clipPath }) => (
                 <i
@@ -459,6 +389,7 @@ export default function LandingExperience() {
                 />
               ))}
             </div>
+            <div data-hero-flash className={styles.heroFlash} />
           </div>
 
           <button data-space-prompt className={`${styles.spacePrompt} ${isSpacePressed ? styles.spacePressed : ""}`} onClick={enterSite}>
@@ -573,37 +504,8 @@ export default function LandingExperience() {
           <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
         </section>
 
-        <section id="process" data-cinematic-section className={styles.processSection}>
-          <div data-reveal className={styles.sectionHead}>
-            <p className={styles.mono}>HOW IT WORKS</p>
-            <h2>From first call<br />to live site</h2>
-          </div>
-          <div data-process-grid className={styles.processGrid}>
-            <span data-process-signal className={styles.processSignal} aria-hidden="true" />
-            <AnimatePresence mode="wait">
-              <motion.aside key={activeProcess} className={styles.processDetail} initial={{ opacity: 0, x: -28, rotateY: -8 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} exit={{ opacity: 0, x: 20, rotateY: 6 }} transition={{ type: "spring", stiffness: 180, damping: 24 }}>
-                <span>ACTIVE STAGE · {processSteps[activeProcess][0]}</span>
-                <h3>{processSteps[activeProcess][1]}</h3>
-                <p>{processSteps[activeProcess][2]}</p>
-              </motion.aside>
-            </AnimatePresence>
-            <div className={styles.processNodes}>
-              {processSteps.map(([number, title], index) => (
-                <button 
-                  ref={el => { processNodesRef.current[index] = el; }}
-                  data-process-step 
-                  data-active={activeProcess === index} 
-                  aria-pressed={activeProcess === index} 
-                  onClick={() => setActiveProcess(index)} 
-                  key={number} 
-                  className={styles.processStep}
-                >
-                  <span className={styles.stepNumber}><i /><b />{number}</span>
-                  <strong>{title}</strong>
-                </button>
-              ))}
-            </div>
-          </div>
+        <section id="process" className={styles.howItWorksSection}>
+          <ScrollScrubVideo />
         </section>
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
