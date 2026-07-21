@@ -3,13 +3,13 @@
 import { useGSAP } from "@gsap/react";
 import { animate } from "animejs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Braces, Compass, Orbit, PenTool } from "lucide-react";
+import { ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Compass } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "lenis/react";
 import Image from "next/image";
 import Link from "next/link";
-import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState, SVGProps } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import ScrollScrubVideo from "@/components/ScrollScrubVideo";
@@ -22,7 +22,7 @@ const founders = [
   ["Advay", "Vaidya", "CFA aspirant"],
 ] as const;
 
-const DesigningIcon = (props: any) => (
+const DesigningIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <g transform="scale(0.7) translate(2, 2)">
       <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
@@ -37,7 +37,7 @@ const DesigningIcon = (props: any) => (
   </svg>
 );
 
-const RefiningIcon = (props: any) => (
+const RefiningIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <g transform="scale(0.65) translate(1, 9)">
       <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
@@ -52,7 +52,7 @@ const RefiningIcon = (props: any) => (
   </svg>
 );
 
-const DeliveryIcon = (props: any) => (
+const DeliveryIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <g transform="scale(0.8) translate(3, 4)">
       <polyline points="20 12 20 22 4 22 4 12"></polyline>
