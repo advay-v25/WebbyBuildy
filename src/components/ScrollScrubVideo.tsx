@@ -12,8 +12,6 @@ gsap.registerPlugin(ScrollTrigger);
 const FRAME_DURATION = 1 / 24; // 24fps
 const VIDEO_DURATION = 10; // seconds
 
-let isScrollTriggerSetUp = false;
-
 export default function ScrollScrubVideo() {
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -24,12 +22,14 @@ export default function ScrollScrubVideo() {
   const letterboxBottomRef = useRef<HTMLDivElement>(null);
   const vignetteRef = useRef<HTMLDivElement>(null);
   const grainRef = useRef<HTMLDivElement>(null);
+  const processExitRef = useRef<HTMLDivElement>(null);
 
   useLenis(() => ScrollTrigger.update());
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const lastFrameRef = useRef(-1);
+  const pendingTimeRef = useRef(0);
   const pointerXRef = useRef(0);
   const pointerYRef = useRef(0);
   const currentRotateXRef = useRef(0);
@@ -73,30 +73,43 @@ export default function ScrollScrubVideo() {
     return () => stage?.removeEventListener("pointermove", handlePointerMove);
   }, [isTouchDevice, reducedMotion]);
 
-  // Wait for video metadata
+  // Wait for the first decoded frame so the poster never flashes to black
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleLoadedMetadata = () => {
-      console.log("Video metadata loaded, duration:", video.duration);
+    const handleLoadedData = () => {
       video.currentTime = 0;
       setIsVideoReady(true);
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
-    if (video.readyState >= 1) {
-      handleLoadedMetadata();
+    const handleSeeked = () => {
+      const target = pendingTimeRef.current;
+      if (Math.abs(video.currentTime - target) > FRAME_DURATION * 1.5) {
+        video.currentTime = target;
+        lastFrameRef.current = Math.round(target / FRAME_DURATION);
+      }
+    };
+
+    video.addEventListener("seeked", handleSeeked);
+
+    if (video.readyState >= 2) {
+      handleLoadedData();
     } else {
-      video.addEventListener("loadedmetadata", handleLoadedMetadata);
-      return () => video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.addEventListener("loadeddata", handleLoadedData);
     }
+
+    return () => {
+      video.removeEventListener("loadeddata", handleLoadedData);
+      video.removeEventListener("seeked", handleSeeked);
+    };
   }, []);
 
   // Set up ScrollTrigger with cinematic effects
   useGSAP(
     () => {
       if (!isVideoReady || !videoRef.current) return;
-      if (isScrollTriggerSetUp) return;
 
       const video = videoRef.current;
       const container = containerRef.current;
@@ -107,10 +120,9 @@ export default function ScrollScrubVideo() {
       const letterboxBottom = letterboxBottomRef.current;
       const vignette = vignetteRef.current;
       const grain = grainRef.current;
+      const processExit = processExitRef.current;
 
       if (!container || !videoPanel || !stage) return;
-
-      console.log("Setting up ScrollTrigger with cinematic effects");
 
       const roundToFrame = (seconds: number): number => {
         return Math.round(seconds / FRAME_DURATION) * FRAME_DURATION;
@@ -124,7 +136,7 @@ export default function ScrollScrubVideo() {
       });
 
       // Set initial states
-      gsap.set(video, { opacity: 0 });
+      gsap.set(video, { opacity: 0.14 });
       gsap.set(stage, {
         perspective: 1200,
         transformStyle: "preserve-3d"
@@ -132,6 +144,7 @@ export default function ScrollScrubVideo() {
       gsap.set([letterboxTop, letterboxBottom], { height: 0 });
       gsap.set(vignette, { opacity: 0 });
       gsap.set(grain, { opacity: reducedMotion ? 0 : 0.04 });
+      gsap.set(processExit, { opacity: 0, y: 24 });
 
       // Grain animation (subtle drift)
       if (grain && !reducedMotion) {
@@ -149,29 +162,31 @@ export default function ScrollScrubVideo() {
           start: "top top",
           end: "bottom bottom",
           pin: videoPanel,
-          scrub: 0.5,
+          scrub: 1,
           onUpdate: (self) => {
             const progress = self.progress;
-
             // ===== VIDEO SCRUBBING (UNCHANGED) =====
-            const fadeInProgress = Math.min(progress / 0.08, 1);
+            const fadeInProgress = 0.14 + Math.min(progress / 0.08, 1) * 0.86;
             gsap.set(video, { opacity: fadeInProgress });
 
-            const rawTime = progress * VIDEO_DURATION;
+            const rawTime = Math.min(progress * VIDEO_DURATION, VIDEO_DURATION - FRAME_DURATION);
             const frameTime = roundToFrame(rawTime);
             const currentFrame = Math.round(frameTime / FRAME_DURATION);
             const lastFrame = lastFrameRef.current;
+            pendingTimeRef.current = frameTime;
 
-            if (currentFrame !== lastFrame) {
+            if (currentFrame !== lastFrame && !video.seeking) {
               video.currentTime = frameTime;
               lastFrameRef.current = currentFrame;
             }
 
             // ===== CINEMATIC EFFECTS (if not reduced motion) =====
             if (!reducedMotion) {
-              // Dolly-in: scale and translateZ
-              const dollyProgress = gsap.utils.mapRange(0, 1, 1.12, 1, progress);
-              const dollyZ = gsap.utils.mapRange(0, 1, -60, 0, progress);
+              const entry = Math.min(progress / .14, 1);
+              const exit = Math.max((progress - .86) / .14, 0);
+              const dollyProgress = .84 + entry * .16 - exit * .08;
+              const dollyZ = -80 + entry * 80 - exit * 45;
+              const frameRadius = (1 - entry) * 34 + exit * 38;
 
               // Subtle rotation: tilt in and out
               const tiltX = gsap.utils.mapRange(0, 1, 2.5, 0, progress);
@@ -188,7 +203,8 @@ export default function ScrollScrubVideo() {
                   translateZ(${dollyZ}px)
                   rotateX(${finalRotateX}deg)
                   rotateY(${finalRotateY}deg)
-                `
+                `,
+                borderRadius: `${frameRadius}px`,
               });
 
               // Letterbox animation: fade in top/bottom over first/last 10%
@@ -217,6 +233,13 @@ export default function ScrollScrubVideo() {
                   filter: `blur(${headingBlur}px)`
                 });
               }
+
+              if (processExit) {
+                gsap.set(processExit, {
+                  opacity: gsap.utils.clamp(0, 1, (progress - .88) / .08),
+                  y: gsap.utils.mapRange(.88, 1, 24, 0, progress),
+                });
+              }
             }
           },
         },
@@ -237,13 +260,10 @@ export default function ScrollScrubVideo() {
         rafId = requestAnimationFrame(updateParallax);
       }
 
-      isScrollTriggerSetUp = true;
-
       return () => {
         tl.kill();
         if (rafId) cancelAnimationFrame(rafId);
         gsap.set([stage, heading, grain], { clearProps: "all" });
-        isScrollTriggerSetUp = false;
       };
     },
     { scope: containerRef, dependencies: [isVideoReady, reducedMotion, isTouchDevice] }
@@ -259,6 +279,7 @@ export default function ScrollScrubVideo() {
             muted
             playsInline
             preload="auto"
+            poster="/videos/how-it-works-poster.jpg"
             controls
           >
             <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
@@ -283,6 +304,7 @@ export default function ScrollScrubVideo() {
             muted
             playsInline
             preload="auto"
+            poster="/videos/how-it-works-poster.jpg"
           >
             <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
           </video>
@@ -303,6 +325,11 @@ export default function ScrollScrubVideo() {
         {/* Gradient fades (from cosmetic fixes) */}
         <div className={styles.gradientTop} />
         <div className={styles.gradientBottom} />
+
+        <div ref={processExitRef} className={styles.processExit}>
+          <span>NEXT CHAPTER</span>
+          <strong>Three paths <em>One studio</em></strong>
+        </div>
       </div>
     </section>
   );

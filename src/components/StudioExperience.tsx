@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
+import { CinematicMotionField } from "@/components/CinematicMotionField";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,6 +48,12 @@ export function StudioExperience() {
       duration: 1.4,
       ease: "power3.out",
     });
+    gsap.fromTo("[data-studio-grid]", { rotateY: 3, xPercent: 2 }, {
+      rotateY: -3,
+      xPercent: -2,
+      ease: "none",
+      scrollTrigger: { trigger: "[data-studio-grid]", start: "top 78%", end: "bottom 24%", scrub: 1 },
+    });
     ScrollTrigger.create({
       trigger: "[data-studio-grid]",
       start: "top 68%",
@@ -78,6 +85,7 @@ export function StudioExperience() {
       <SiteHeader activeSection="founders" />
       <main id="main-content">
         <section className={`${styles.foundersSection} ${styles.studioPageFounders}`}>
+          <CinematicMotionField variant="studio" />
           <div data-studio-copy className={styles.foundersIntro}>
             <p className={styles.mono}>MUMBAI / FOUNDERS</p>
             <h1>Three paths<br /><span>One studio</span></h1>
@@ -112,6 +120,7 @@ export function StudioExperience() {
         </section>
 
         <section id="studio-manifesto" data-manifesto className={styles.studioManifesto}>
+          <CinematicMotionField variant="system" />
           <span data-manifesto-signal className={styles.manifestoSignal} aria-hidden="true" />
           <p className={styles.mono}>HOW WE WORK</p>
           <h2>You talk to the people<br />doing the work</h2>
@@ -123,7 +132,7 @@ export function StudioExperience() {
 
         <section id="contact" className={styles.contactSection}>
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
-          <div><h2>Got an idea?<br />Let’s build <span>it</span></h2><a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a></div>
+          <div><h2>Have something<br /><span>worth building</span></h2><a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a></div>
           <Link href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
           <footer><span>Mumbai · India</span><span>WEBBYBUILDY © {new Date().getFullYear()}</span></footer>
         </section>
