@@ -1,6 +1,6 @@
 .track {
   position: relative;
-  height: 500vh;
+  height: 380vh;
   background: linear-gradient(180deg, #050505, #090808);
 }
 
@@ -51,6 +51,10 @@
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #050505;
+  box-shadow: 0 42px 110px rgba(0,0,0,.78), 0 0 70px rgba(225,56,45,.08);
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -143,11 +147,27 @@
   z-index: 6;
 }
 
+.processExit {
+  position: absolute;
+  z-index: 13;
+  right: var(--gutter);
+  bottom: clamp(5.5rem,10vh,8.5rem);
+  display: grid;
+  justify-items: end;
+  gap: .6rem;
+  color: #f3efe8;
+  text-align: right;
+  pointer-events: none;
+}
+
+.processExit span { color: #ff6254; font: 600 .58rem/1 var(--font-mono); letter-spacing: .14em; }
+.processExit strong { font: 550 clamp(1.8rem,3.4vw,4.2rem)/.95 var(--font-display); letter-spacing: -.055em; }
+.processExit em { font-family: Georgia,serif; font-weight: 400; }
+
 .loadingPlaceholder {
   position: absolute;
   inset: 0;
-  background: #1a1a1a;
-  animation: pulse 2s ease-in-out infinite;
+  background: #050505 url('/videos/how-it-works-poster.jpg') center/cover no-repeat;
 }
 
 @keyframes pulse {
@@ -187,7 +207,7 @@
 /* Mobile styles */
 @media (max-width: 800px) {
   .track {
-    height: 300vh;
+    height: 260vh;
   }
 
   .videoPanel {
@@ -206,6 +226,8 @@
     width: 100%;
     font-size: clamp(2.5rem, 12vw, 4.5rem);
   }
+
+  .processExit { right: 20px; left: 20px; }
 
   .sectionReducedMotion {
     min-height: 100vh;

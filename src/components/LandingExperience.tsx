@@ -13,6 +13,7 @@ import { CSSProperties, useCallback, useEffect, useRef, useState, SVGProps } fro
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import ScrollScrubVideo from "@/components/ScrollScrubVideo";
+import { CinematicMotionField } from "@/components/CinematicMotionField";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,7 +77,7 @@ const capabilities = [
 
 const projects = [
   { number: "01", title: "PlannrAI", copy: "A complete AI-powered product, designed, built and launched by the three of us", live: true, image: "/images/plannrai-hero.png", link: "https://plannrai.in" },
-  { number: "02", title: "Private Consulting Website", copy: "Goal: a private consulting page that positions an individual brand", live: true, image: "/images/client3-consulting.png", link: "#" },
+  { number: "02", title: "Be3", copy: "A human resources platform shaped around clearer services, stronger trust and a more confident digital presence", live: true, image: "/images/be3-hero.png", link: "https://be3.co.in" },
   { number: "03", title: "Next project", copy: "There will be more work here soon", live: false, image: "", link: "#" },
 ] as const;
 
@@ -87,16 +88,18 @@ const deckPose = (index: number, active: number) => {
   return { x: "-38%", y: 30, scale: 0.68, rotateY: 14, opacity: 0.38, zIndex: 2 };
 };
 
-const keyboardFragments = Array.from({ length: 28 }, (_, index) => {
-  const columns = 7;
-  const rows = 4;
+const keyboardFragments = Array.from({ length: 60 }, (_, index) => {
+  const columns = 10;
+  const rows = 6;
   const column = index % columns;
   const row = Math.floor(index / columns);
   return {
     index,
     column,
     row,
-    clipPath: `inset(${(row * 100) / rows}% ${100 - ((column + 1) * 100) / columns}% ${100 - ((row + 1) * 100) / rows}% ${(column * 100) / columns}%)`,
+    left: `${(column * 100) / columns}%`,
+    top: `${(row * 100) / rows}%`,
+    backgroundPosition: `${(column * 100) / (columns - 1)}% ${(row * 100) / (rows - 1)}%`,
   };
 });
 
@@ -104,9 +107,12 @@ export default function LandingExperience() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLElement>(null);
   const introVideo = useRef<HTMLVideoElement>(null);
-  const pressVideo = useRef<HTMLVideoElement>(null);
   const spaceKey = useRef<HTMLSpanElement>(null);
-  const lenis = useLenis(() => ScrollTrigger.update());
+  const entranceTimeline = useRef<gsap.core.Timeline | null>(null);
+  const entranceComplete = useRef(false);
+  const introSettled = useRef(false);
+  const videoDecoded = useRef(false);
+  useLenis(() => ScrollTrigger.update());
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
@@ -116,6 +122,7 @@ export default function LandingExperience() {
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
 
   const enterSite = useCallback(() => {
+    if (entranceComplete.current || entranceTimeline.current?.isActive()) return;
     setIsSpacePressed(true);
     if (spaceKey.current) {
       animate(spaceKey.current, {
@@ -125,21 +132,16 @@ export default function LandingExperience() {
         ease: "inOutQuint",
       });
     }
-    const workSection = document.getElementById("work");
-    const cinematicTrigger = ScrollTrigger.getById("hero-cinematic");
-    const destination = workSection
-      ? window.scrollY + workSection.getBoundingClientRect().top - 18
-      : cinematicTrigger?.end ?? (hero.current?.offsetTop ?? 0) + window.innerHeight * 1.9;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    lenis?.scrollTo(destination, {
-      duration: reducedMotion ? 0 : 4.2,
-      immediate: reducedMotion,
-      easing: (t) => 0.5 - Math.cos(Math.PI * t) / 2,
-    });
-    if (!lenis) window.scrollTo({ top: destination });
-    window.setTimeout(() => setIsSpacePressed(false), 1450);
-    window.setTimeout(() => introVideo.current?.pause(), reducedMotion ? 0 : 4300);
-  }, [lenis]);
+    introVideo.current?.pause();
+    entranceTimeline.current?.restart();
+  }, []);
+
+  const settleIntro = useCallback(() => {
+    if (introSettled.current) return;
+    introSettled.current = true;
+    gsap.to(introVideo.current, { opacity: 0, duration: 1.05, ease: "power2.inOut" });
+    gsap.to("[data-keyboard-idle]", { opacity: 1, duration: 1.05, ease: "power2.inOut" });
+  }, []);
 
   const moveProject = useCallback((direction: -1 | 1) => {
     setActiveProject((current) => (current + direction + projects.length) % projects.length);
@@ -166,6 +168,17 @@ export default function LandingExperience() {
   }, [enterSite, moveProject]);
 
   useEffect(() => {
+    const onWheel = (event: WheelEvent) => {
+      if (window.scrollY < 12 && event.deltaY > 12 && !entranceComplete.current) {
+        event.preventDefault();
+        enterSite();
+      }
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [enterSite]);
+
+  useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then((registrations) => {
         registrations.forEach((registration) => {
@@ -175,18 +188,24 @@ export default function LandingExperience() {
     }
 
     const fallback = window.setTimeout(() => {
-      setVideoReady(true);
-    }, 6500);
+      if (!videoDecoded.current) settleIntro();
+    }, 4200);
     document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
 
     return () => {
       window.clearTimeout(fallback);
     };
-  }, []);
+  }, [settleIntro]);
 
   useGSAP(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    if (reduced) {
+      entranceTimeline.current = gsap.timeline({ paused: true, onComplete: () => { entranceComplete.current = true; } })
+        .set("[data-hero-copy-wrap],[data-space-prompt]", { opacity: 0 })
+        .set("[data-story-curtain]", { yPercent: 0, opacity: 1 })
+        .set("[data-curtain-copy]", { opacity: 1, y: 0 });
+      return;
+    }
 
     const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
     intro
@@ -194,66 +213,90 @@ export default function LandingExperience() {
       .fromTo("[data-hero-copy]", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, "-=0.55")
       .fromTo("[data-space-prompt]", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.65 }, "-=0.4");
 
-    const heroTimeline = gsap.timeline({
-      scrollTrigger: {
-        id: "hero-cinematic",
-        trigger: hero.current,
-        start: "top top",
-        end: "+=95%",
-        pin: true,
-        scrub: 1.2,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          if (self.progress <= 0.002) {
-            gsap.set("[data-space-prompt]", { opacity: 1, y: 0 });
-          }
-        },
+    gsap.set("[data-keyboard-pressed]", { opacity: 0 });
+    gsap.set("[data-keyboard-fragment]", { opacity: 0 });
+    gsap.set("[data-keyboard-energy]", { opacity: 0 });
+    gsap.set("[data-energy-core]", { opacity: 0, scaleX: .04, transformOrigin: "12% 50%" });
+    gsap.set("[data-energy-rays]", { opacity: 0, xPercent: -135, scaleX: .7, transformOrigin: "50% 50%" });
+    gsap.set("[data-energy-outline]", { opacity: 0, scale: .985, transformOrigin: "50% 50%" });
+    gsap.set("[data-story-curtain]", { yPercent: 100, opacity: 0 });
+
+    const resetEntrance = () => {
+      entranceTimeline.current?.pause(0);
+      entranceComplete.current = false;
+      setIsSpacePressed(false);
+      gsap.set("[data-story-curtain]", { yPercent: 100, opacity: 0 });
+      gsap.set("[data-curtain-copy]", { opacity: 0, y: 36 });
+      gsap.set("[data-keyboard-fragment]", { opacity: 0, clearProps: "transform,filter" });
+      gsap.set("[data-keyboard-energy],[data-energy-core],[data-energy-rays],[data-energy-outline]", { opacity: 0, clearProps: "transform,filter" });
+      gsap.set("[data-keyboard-pressed]", { opacity: 0, clearProps: "transform" });
+      gsap.set("[data-keyboard-idle]", { opacity: 1, clearProps: "transform" });
+      gsap.set("[data-hero-copy-wrap],[data-space-prompt]", { opacity: 1, clearProps: "transform" });
+    };
+
+    ScrollTrigger.create({
+      id: "hero-cinematic",
+      trigger: hero.current,
+      start: "top top",
+      end: "+=100%",
+      pin: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        if (self.progress > 0.008 && !entranceComplete.current && !entranceTimeline.current?.isActive()) enterSite();
+        if (self.progress <= 0.001 && self.direction < 0 && entranceComplete.current) resetEntrance();
+      },
+      onLeaveBack: resetEntrance,
+    });
+
+    entranceTimeline.current = gsap.timeline({
+      paused: true,
+      defaults: { ease: "power3.inOut" },
+      onComplete: () => {
+        entranceComplete.current = true;
+        setIsSpacePressed(false);
       },
     });
-    heroTimeline
-      // Establishing shot fades out as the copy clears the frame.
-      .to("[data-hero-copy-wrap]", { opacity: 0, y: -64, duration: 0.18, ease: "power2.in" }, 0.04)
-      .to("[data-space-prompt]", { opacity: 0, y: 22, duration: 0.12, ease: "power2.in" }, 0.03)
-      // Beat 1: a light burst masks the cut from the looping ambient shot to the press-reaction clip -- same
-      // camera angle as the loop, so the dissolve reads as one continuous take, not a cut.
-      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "power1.in" }, 0.015)
-      .to(introVideo.current, { opacity: 0, duration: 0.07, ease: "power2.in" }, 0.03)
-      .fromTo("[data-press-video]", { opacity: 0 }, { opacity: 1, duration: 0.07, ease: "power2.out" }, 0.035)
-      .call(() => { pressVideo.current?.play().catch(() => undefined); }, [], 0.035)
-      .to("[data-hero-flash]", { opacity: 0, duration: 0.09, ease: "power2.out" }, 0.09)
-      // Beat 2: the press clip plays its light burst and glow settle in real time; once it's had room to
-      // land, crossfade to a matching still (extracted from the same clip) so the shatter has a stable frame.
-      .to("[data-press-video]", { opacity: 0, duration: 0.045, ease: "power1.in" }, 0.42)
-      .fromTo("[data-keyboard-pressed]", { opacity: 0, scale: 1.012 }, { opacity: 1, scale: 1.006, duration: 0.11, ease: "power2.out" }, 0.425)
-      .set("[data-keyboard-fragment]", { opacity: 1 }, 0.46)
-      // Beat 3: the keyboard shatters, the curtain rises.
-      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.3, ease: "power3.inOut" }, 0.48)
-      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 0.2, ease: "power2.out" }, 0.6)
-      .fromTo("[data-curtain-copy]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out" }, 0.62)
-      .to(hero.current, { "--hero-shade-opacity": 0, duration: 0.2, ease: "power1.out" }, 0.62)
+
+    entranceTimeline.current
+      // Beat one — the interface quiets before the physical press
+      .to("[data-space-prompt]", { opacity: 0, y: 14, duration: 0.55, ease: "power2.in" }, 0)
+      .to("[data-hero-copy-wrap]", { opacity: 0, y: -28, duration: 0.9, ease: "power2.inOut" }, 0.08)
+      .to(introVideo.current, { opacity: 0, duration: 0.7, ease: "power2.inOut" }, 0)
+      // Beat two — compression, light response, then a deliberate hold
+      .to("[data-keyboard-idle]", { y: 11, scale: 0.996, opacity: 0, duration: 0.48, ease: "power2.in" }, 0.2)
+      .fromTo("[data-keyboard-pressed]", { opacity: 0, y: 0, scale: 1.002 }, { opacity: 1, y: 11, scale: 0.996, duration: 0.48, ease: "power2.out" }, 0.22)
+      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 0.2, duration: 0.28, ease: "sine.out" }, 0.36)
+      .to("[data-hero-flash]", { opacity: 0, duration: 0.8, ease: "sine.out" }, 0.64)
+      // The signal originates beneath the physical space bar and travels across the board
+      .to("[data-keyboard-energy]", { opacity: 1, duration: .16, ease: "power1.out" }, .48)
+      .to("[data-energy-core]", { opacity: .94, scaleX: 1, duration: .92, ease: "power2.inOut" }, .48)
+      .to("[data-energy-rays]", { opacity: .86, xPercent: 130, scaleX: 1, duration: 1.08, ease: "power2.inOut" }, .5)
+      .to("[data-energy-outline]", { opacity: .9, scale: 1, duration: .72, ease: "power2.out" }, .82)
+      .to("[data-energy-core]", { opacity: .68, filter: "brightness(1.32)", duration: .42, ease: "sine.inOut" }, 1.14)
+      .to("[data-energy-core],[data-energy-rays],[data-energy-outline]", { opacity: 0, duration: .7, ease: "sine.inOut" }, 1.42)
+      .to("[data-keyboard-energy]", { opacity: 0, duration: .12 }, 1.98)
+      .set("[data-keyboard-fragment]", { opacity: 1 }, 1.7)
+      // Beat three — pieces release from the space-bar region and fall under gravity
       .to("[data-keyboard-fragment]", {
-        xPercent: (index) => {
-          const column = index % 7;
-          return (column - 3) * 48;
-        },
-        yPercent: (index) => {
-          const row = Math.floor(index / 7);
-          return (row - 1.5) * 62;
-        },
-        z: (index) => 90 + (index % 5) * 85,
-        rotateX: (index) => (index % 2 ? 1 : -1) * (8 + (index % 4) * 3),
-        rotateY: (index) => (index % 3 - 1) * 15,
-        rotateZ: (index) => ((index % 2 ? 1 : -1) * (4 + (index % 7) * 1.6)),
-        scale: 0.68,
-        filter: "blur(10px)",
-        opacity: 0,
-        stagger: { amount: 0.18, from: "center" },
-        duration: 0.32,
-        ease: "power3.inOut",
-      }, 0.48)
-      .to("[data-keyboard-pressed]", { opacity: 0, duration: 0.16 }, 0.52)
-      .to("[data-curtain-copy]", { y: -18, duration: 0.2, ease: "none" }, 0.8);
+        x: (index) => ((index % 10) - 4.5) * 13 + ((index * 17) % 31) - 15,
+        y: (index) => window.innerHeight * (1.02 + Math.floor(index / 10) * .055 + ((index * 23) % 17) / 100),
+        z: (index) => 45 + (index % 6) * 28,
+        rotateX: (index) => 18 + (index % 5) * 12,
+        rotateY: (index) => ((index % 3) - 1) * 18,
+        rotateZ: (index) => ((index % 2 ? 1 : -1) * (5 + (index % 10) * 1.2)),
+        scale: (index) => 0.82 + (index % 4) * 0.035,
+        stagger: { each: 0.032, grid: [6, 10], from: 54 },
+        duration: 2.55,
+        ease: "power2.in",
+      }, 1.72)
+      .to("[data-keyboard-fragment]", { opacity: 0, duration: .88, stagger: { each: .018, grid: [6, 10], from: 54 }, ease: "power1.in" }, 3.42)
+      .to("[data-keyboard-pressed]", { opacity: 0, y: 70, scale: .985, duration: 1.4, ease: "power2.in" }, 1.82)
+      // Beat four — the next chapter arrives only after the physical action reads
+      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 1 }, { yPercent: 0, opacity: 1, duration: 1.85, ease: "expo.inOut" }, 2.62)
+      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: "power3.out" }, 3.88)
+      .fromTo("[data-curtain-copy]", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 1.12, ease: "power3.out" }, 4.05)
+      .to(hero.current, { "--hero-shade-opacity": 0, duration: 1, ease: "power1.out" }, 3.45);
 
     ([
       ["#top", "top"],
@@ -294,6 +337,36 @@ export default function LandingExperience() {
       .fromTo("[data-energy-path]", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.72, ease: "none" }, 0.16)
       .from("[data-capability-note]", { opacity: 0, y: 30, duration: 0.2 }, 0.62);
 
+    const desktopMotion = gsap.matchMedia();
+    desktopMotion.add("(min-width: 801px)", () => {
+      const capabilityLock = ScrollTrigger.create({
+        id: "capability-cinematic-lock",
+        trigger: "[data-capabilities]",
+        start: "top top",
+        end: "+=170%",
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: ({ progress }) => {
+          setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
+        },
+      });
+      return () => capabilityLock.kill();
+    });
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: "#work",
+        start: "top 98%",
+        end: "top 28%",
+        scrub: 1.15,
+      },
+    })
+      .fromTo("[data-work-wipe]", { yPercent: 0 }, { yPercent: -104, ease: "power3.inOut" }, 0)
+      .fromTo("[data-work-heading]", { opacity: 0, y: 56 }, { opacity: 1, y: 0, ease: "power2.out" }, .2)
+      .fromTo("[data-project-rail]", { opacity: .08, y: 54, scale: .975 }, { opacity: 1, y: 0, scale: 1, ease: "power2.out" }, .28);
+
     gsap.utils.toArray<HTMLElement>("[data-project-panel]").forEach((panel, index) => {
       gsap.from(panel, {
         opacity: 0,
@@ -320,6 +393,15 @@ export default function LandingExperience() {
       });
     });
 
+    gsap.utils.toArray<HTMLElement>("[data-section-stage]").forEach((stage) => {
+      gsap.fromTo(stage, { y: 88, scale: .955, rotateX: 7, transformOrigin: "50% 100%" }, {
+        y: 0,
+        scale: 1,
+        rotateX: 0,
+        ease: "none",
+        scrollTrigger: { trigger: stage, start: "top 94%", end: "top 55%", scrub: 1 },
+      });
+    });
 
     gsap.fromTo("[data-founder-panel]", {
       opacity: 0,
@@ -381,7 +463,10 @@ export default function LandingExperience() {
       });
     });
 
-    return () => cleanups.forEach((cleanup) => cleanup());
+    return () => {
+      desktopMotion.revert();
+      cleanups.forEach((cleanup) => cleanup());
+    };
   }, { scope: root });
 
   return (
@@ -406,31 +491,38 @@ export default function LandingExperience() {
               className={`${styles.heroVideo} ${videoReady ? styles.heroVideoReady : ""}`}
               autoPlay
               muted
-              loop
               playsInline
               preload="auto"
-              poster="/hero/keyboard-loop-poster.jpg"
-              onCanPlay={() => setVideoReady(true)}
+              poster="/hero/keyboard-intro-clean-poster.jpg"
+              onCanPlay={() => {
+                videoDecoded.current = true;
+                setVideoReady(true);
+              }}
+              onTimeUpdate={(event) => {
+                const video = event.currentTarget;
+                if (video.duration && video.duration - video.currentTime < 1.05) settleIntro();
+              }}
+              onEnded={settleIntro}
+              onError={() => {
+                setVideoReady(false);
+                settleIntro();
+              }}
             >
-              <source src="/hero/keyboard-loop.mp4" type="video/mp4" />
+              <source src="/hero/keyboard-intro-clean.mp4" type="video/mp4" />
             </video>
-            <video
-              ref={pressVideo}
-              data-press-video
-              className={styles.heroVideoPress}
-              muted
-              playsInline
-              preload="auto"
-            >
-              <source src="/hero/keyboard-press-glow.mp4" type="video/mp4" />
-            </video>
+            <div data-keyboard-idle className={styles.keyboardIdle} />
             <div data-keyboard-pressed className={styles.keyboardPressed} />
+            <div data-keyboard-energy className={styles.keyboardEnergy}>
+              <i data-energy-rays className={styles.keyboardEnergyRays} />
+              <i data-energy-outline className={styles.keyboardEnergyOutline} />
+              <i data-energy-core className={styles.keyboardEnergyCore} />
+            </div>
             <div className={styles.keyboardFragments}>
-              {keyboardFragments.map(({ index, column, row, clipPath }) => (
+              {keyboardFragments.map(({ index, column, row, left, top, backgroundPosition }) => (
                 <i
                   data-keyboard-fragment
                   key={index}
-                  style={{ clipPath, "--fragment-column": column, "--fragment-row": row } as CSSProperties}
+                  style={{ left, top, backgroundPosition, "--fragment-column": column, "--fragment-row": row } as CSSProperties}
                 />
               ))}
             </div>
@@ -445,7 +537,6 @@ export default function LandingExperience() {
           <div data-story-curtain className={styles.storyCurtain}>
             <div data-curtain-line className={styles.curtainLine} />
             <div data-curtain-copy>
-              <span>Selected work / 2026</span>
               <strong>Built to be used<br /><em>Designed to be felt</em></strong>
               <p>Strategy, design, development and motion — without the agency drag</p>
             </div>
@@ -453,10 +544,12 @@ export default function LandingExperience() {
         </section>
 
         <section id="work" data-cinematic-section className={styles.workSection}>
-          <div data-reveal className={styles.workHeading}>
+          <div data-work-wipe className={styles.workTransitionWipe} aria-hidden="true"><i /></div>
+          <CinematicMotionField variant="work" />
+          <div data-work-heading className={styles.workHeading}>
             <h2>Work that <span>earns</span> attention</h2>
             <div className={styles.workUtility}>
-              <p>Three spaces One is live Two are ready for what comes next</p>
+              <p>Every project is built with close attention, personal collaboration and a design approach shaped around the people it needs to serve</p>
               <div className={styles.carouselControls} aria-label="Project carousel controls">
                 <button onClick={() => moveProject(-1)} aria-label="Previous project"><ArrowLeft size={17} /></button>
                 <span>0{activeProject + 1} / 03</span>
@@ -472,7 +565,7 @@ export default function LandingExperience() {
                 data-active={activeProject === index}
                 tabIndex={0}
                 role="button"
-                aria-label={project.live ? "Preview PlannrAI" : `Preview future project slot ${project.number}`}
+                aria-label={project.live ? `Preview ${project.title}` : `Preview future project slot ${project.number}`}
                 aria-pressed={activeProject === index}
                 onFocus={() => setActiveProject(index)}
                 onClick={() => setActiveProject(index)}
@@ -495,7 +588,7 @@ export default function LandingExperience() {
                   <h3>{project.live ? project.title : <>Next<br />project</>}</h3>
                   <p>{project.copy}</p>
                 </div>
-                {project.live && activeProject === index && project.link !== "#" ? (
+                {project.live && activeProject === index ? (
                   <a className={styles.projectVisit} href={project.link} target="_blank" rel="noreferrer" aria-label={`Visit ${project.title}`}><ArrowUpRight /></a>
                 ) : <ArrowDownRight className={styles.projectArrow} aria-hidden="true" />}
               </motion.article>
@@ -504,6 +597,7 @@ export default function LandingExperience() {
         </section>
 
         <section data-capabilities data-cinematic-section className={styles.capabilitiesSection}>
+          <CinematicMotionField variant="system" />
           <div className={styles.capabilitiesLeft}>
             <div className={styles.capabilitiesCopy} data-capability-copy>
               <p className={styles.mono}>ONE CONTINUOUS SYSTEM</p>
@@ -511,7 +605,7 @@ export default function LandingExperience() {
             </div>
             <p data-capability-note className={styles.capabilityNote}><em>Every interaction has a job</em><br />Every frame moves the story forward</p>
           </div>
-          <div className={styles.systemStage}>
+          <div data-section-stage className={styles.systemStage}>
             <div className={styles.systemRail} aria-hidden="true"><i /></div>
             <div className={styles.systemNodes}>
             {capabilities.map(([number, title, copy, Icon], index) => (
@@ -550,11 +644,19 @@ export default function LandingExperience() {
           </div>
         </section>
 
+        <section data-process-bridge className={styles.processBridge}>
+          <CinematicMotionField variant="system" />
+          <p data-reveal className={styles.mono}>FROM SYSTEM TO MOTION</p>
+          <h2 data-reveal>The idea becomes a system<br /><em>Then the system moves</em></h2>
+          <span className={styles.processBridgeSignal} aria-hidden="true" />
+        </section>
+
         <section id="process" className={styles.howItWorksSection}>
           <ScrollScrubVideo />
         </section>
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
+          <CinematicMotionField variant="studio" />
           <div data-reveal className={styles.foundersIntro}>
             <p className={styles.mono}>FOUNDERS / STUDIO</p>
             <h2>Three paths<br /><span>One studio</span></h2>
@@ -562,7 +664,7 @@ export default function LandingExperience() {
             <p className={styles.founderSmall}>You speak directly to the people designing and building your site No account managers No hand-offs</p>
                 <Link data-magnetic href="/studio" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
           </div>
-          <div data-founder-grid className={styles.founderGrid}>
+          <div data-founder-grid data-section-stage className={styles.founderGrid}>
             <div className={styles.founderPanorama} aria-hidden="true">
               <Image src="/images/studio-founders-panorama.png" alt="" fill sizes="(max-width: 800px) 100vw, 68vw" />
             </div>
@@ -586,9 +688,10 @@ export default function LandingExperience() {
         </section>
 
         <section id="contact" data-cinematic-section className={styles.contactSection}>
+          <CinematicMotionField variant="finale" />
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
           <div data-reveal>
-            <h2>Got an idea?<br />Let’s build <span>it</span></h2>
+            <h2>Have something<br /><span>worth building</span></h2>
             <a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a>
           </div>
           <Link data-reveal data-magnetic href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
