@@ -113,15 +113,23 @@ export default function LandingExperience() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.code !== "Space" || event.repeat || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
-      event.preventDefault();
-      enterSite();
+      if (event.repeat || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      if (event.code === "Space") {
+        event.preventDefault();
+        enterSite();
+      } else if (event.code === "ArrowLeft") {
+        event.preventDefault();
+        moveProject(-1);
+      } else if (event.code === "ArrowRight") {
+        event.preventDefault();
+        moveProject(1);
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [enterSite]);
+  }, [enterSite, moveProject]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -205,7 +213,7 @@ export default function LandingExperience() {
         id: "hero-cinematic",
         trigger: hero.current,
         start: "top top",
-        end: "+=190%",
+        end: "+=95%",
         pin: true,
         scrub: 1.2,
         anticipatePin: 1,
