@@ -47,6 +47,13 @@
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
+.headingOverlay h2 em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.045em;
+}
+
 .stage {
   position: relative;
   width: 100%;

@@ -14,9 +14,13 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
 
   return (
     <header className={styles.header} data-active-section={activeSection}>
-      <Link href="/#top" className={styles.wordmark} aria-label="WebbyBuildy home" onClick={closeMenu}>
-        WEBBYBUILDY
-      </Link>
+      {/* Plain anchor (not next/link) so it does a full navigation to "/" —
+          this resets the hero to its pre-animation, SPACE-gated first-visit
+          state from every page, and lands at the absolute top with no hash. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a href="/" className={styles.wordmark} aria-label="Sitesmith home" onClick={closeMenu}>
+        SITESMITH
+      </a>
       <button
         className={styles.menuButton}
         onClick={() => setMenuOpen((open) => !open)}
@@ -30,7 +34,7 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
       <nav id="site-navigation" className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`} aria-label="Main navigation">
         <Link data-active={activeSection === "work"} href="/#work" onClick={closeMenu}>Work</Link>
         <Link data-active={activeSection === "process"} href="/#process" onClick={closeMenu}>Process</Link>
-        <Link data-active={activeSection === "founders"} href="/#founders" onClick={closeMenu}>Studio</Link>
+        <Link data-active={activeSection === "founders"} href="/studio" onClick={closeMenu}>Studio</Link>
         <Link data-magnetic href="/book" className={styles.navCta} onClick={closeMenu}>
           Start a project <ArrowUpRight size={15} />
         </Link>

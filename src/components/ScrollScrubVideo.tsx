@@ -294,7 +294,7 @@ export default function ScrollScrubVideo() {
       <div data-video-panel ref={videoPanelRef} className={styles.videoPanel}>
         <div ref={headingRef} className={styles.headingOverlay}>
           <p>HOW IT WORKS</p>
-          <h2>From first call to live site</h2>
+          <h2>From <em>first</em> call to <em>live</em> site</h2>
         </div>
 
         <div ref={stageRef} className={styles.stage}>
