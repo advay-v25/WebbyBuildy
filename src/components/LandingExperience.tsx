@@ -88,26 +88,43 @@ const deckPose = (index: number, active: number) => {
   return { x: "-38%", y: 30, scale: 0.68, rotateY: 14, opacity: 0.38, zIndex: 2 };
 };
 
-const keyboardFragments = Array.from({ length: 60 }, (_, index) => {
-  const columns = 10;
-  const rows = 6;
-  const column = index % columns;
-  const row = Math.floor(index / columns);
-  return {
-    index,
-    column,
-    row,
-    left: `${(column * 100) / columns}%`,
-    top: `${(row * 100) / rows}%`,
-    backgroundPosition: `${(column * 100) / (columns - 1)}% ${(row * 100) / (rows - 1)}%`,
-  };
-});
+const fragmentRows = [
+  { top: 33.2, left: 9.4, count: 18, gap: 4.55, width: 3.55, height: 6.6 },
+  { top: 42.1, left: 8.8, count: 20, gap: 4.22, width: 3.5, height: 6.7 },
+  { top: 50.1, left: 10.1, count: 19, gap: 4.3, width: 3.55, height: 6.8 },
+  { top: 58.1, left: 10.8, count: 18, gap: 4.42, width: 3.7, height: 6.9 },
+  { top: 65.9, left: 12.2, count: 17, gap: 4.48, width: 3.78, height: 7 },
+] as const;
+
+const keyboardFragments = fragmentRows.flatMap((row, rowIndex) =>
+  Array.from({ length: row.count }, (_, column) => {
+    const index = fragmentRows.slice(0, rowIndex).reduce((sum, item) => sum + item.count, 0) + column;
+    const left = row.left + column * row.gap;
+    const seed = ((index * 47 + 19) % 101) / 101;
+    return {
+      index,
+      column,
+      row: rowIndex,
+      left,
+      top: row.top,
+      width: row.width,
+      height: row.height,
+      release: seed * .22 + rowIndex * .025,
+      drift: (seed - .5) * 90,
+      backgroundSize: `${10000 / row.width}% ${10000 / row.height}%`,
+      backgroundPosition: `${(left / (100 - row.width)) * 100}% ${(row.top / (100 - row.height)) * 100}%`,
+    };
+  }),
+);
 
 export default function LandingExperience() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLElement>(null);
   const introVideo = useRef<HTMLVideoElement>(null);
+  const idleVideo = useRef<HTMLVideoElement>(null);
+  const pressVideo = useRef<HTMLVideoElement>(null);
   const spaceKey = useRef<HTMLSpanElement>(null);
+  const openingTimeline = useRef<gsap.core.Timeline | null>(null);
   const entranceTimeline = useRef<gsap.core.Timeline | null>(null);
   const entranceComplete = useRef(false);
   const introSettled = useRef(false);
@@ -123,6 +140,13 @@ export default function LandingExperience() {
 
   const enterSite = useCallback(() => {
     if (entranceComplete.current || entranceTimeline.current?.isActive()) return;
+    // Once entry begins, the intro-to-idle handoff must never run again over
+    // the exit timeline, even if a delayed media event arrives.
+    introSettled.current = true;
+    // A fast user can enter before the opening copy reveal finishes. Resolve
+    // that opening timeline first so it cannot fade the prompt back in over
+    // the keyboard disassembly sequence.
+    openingTimeline.current?.progress(1).pause();
     setIsSpacePressed(true);
     if (spaceKey.current) {
       animate(spaceKey.current, {
@@ -133,14 +157,25 @@ export default function LandingExperience() {
       });
     }
     introVideo.current?.pause();
+    if (pressVideo.current) {
+      pressVideo.current.currentTime = 0;
+      void pressVideo.current.play().catch(() => undefined);
+    }
     entranceTimeline.current?.restart();
   }, []);
 
   const settleIntro = useCallback(() => {
     if (introSettled.current) return;
     introSettled.current = true;
-    gsap.to(introVideo.current, { opacity: 0, duration: 1.05, ease: "power2.inOut" });
-    gsap.to("[data-keyboard-idle]", { opacity: 1, duration: 1.05, ease: "power2.inOut" });
+    // The restored loop's closest visual match to the intro's final frame is
+    // near its end. Start there and crossfade so the camera never jumps back
+    // to the loop's opening angle during the handoff.
+    if (idleVideo.current) {
+      idleVideo.current.currentTime = 7.2;
+      void idleVideo.current.play().catch(() => undefined);
+    }
+    gsap.set(idleVideo.current, { opacity: 1, scale: 1.012, transformOrigin: "50% 58%" });
+    gsap.to(introVideo.current, { opacity: 0, duration: .68, ease: "power2.inOut" });
   }, []);
 
   const moveProject = useCallback((direction: -1 | 1) => {
@@ -227,43 +262,56 @@ export default function LandingExperience() {
     if (reduced) {
       entranceTimeline.current = gsap.timeline({ paused: true, onComplete: () => { entranceComplete.current = true; } })
         .set("[data-hero-copy-wrap],[data-space-prompt]", { opacity: 0 })
+        .set("[data-keyboard-fallback]", { opacity: 0 })
         .set("[data-story-curtain]", { yPercent: 0, opacity: 1 })
         .set("[data-curtain-copy]", { opacity: 1, y: 0 });
       return;
     }
 
     const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
+    openingTimeline.current = intro;
     intro
       .fromTo("[data-hero-line]", { yPercent: 110 }, { yPercent: 0, duration: 1.15, stagger: 0.08 })
       .fromTo("[data-hero-copy]", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, "-=0.55")
       .fromTo("[data-space-prompt]", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.65 }, "-=0.4");
 
-    gsap.set("[data-keyboard-pressed]", { opacity: 0 });
+    gsap.set(idleVideo.current, { opacity: 0, y: 0, scale: 1.012 });
+    gsap.set(pressVideo.current, { opacity: 0, y: 0, scale: 1.012 });
+    gsap.set("[data-keyboard-fallback]", { opacity: 1 });
     gsap.set("[data-keyboard-fragment]", { opacity: 0 });
-    gsap.set("[data-keyboard-energy]", { opacity: 0 });
-    gsap.set("[data-energy-core]", { opacity: 0, scaleX: .04, transformOrigin: "12% 50%" });
-    gsap.set("[data-energy-rays]", { opacity: 0, xPercent: -135, scaleX: .7, transformOrigin: "50% 50%" });
-    gsap.set("[data-energy-outline]", { opacity: 0, scale: .985, transformOrigin: "50% 50%" });
     gsap.set("[data-story-curtain]", { yPercent: 100, opacity: 0 });
 
     const resetEntrance = () => {
       entranceTimeline.current?.pause(0);
       entranceComplete.current = false;
+      introSettled.current = true;
       setIsSpacePressed(false);
+      introVideo.current?.pause();
+      if (pressVideo.current) {
+        pressVideo.current.pause();
+        pressVideo.current.currentTime = 0;
+      }
+      if (idleVideo.current) void idleVideo.current.play().catch(() => undefined);
       gsap.set("[data-story-curtain]", { yPercent: 100, opacity: 0 });
       gsap.set("[data-curtain-copy]", { opacity: 0, y: 36 });
-      gsap.set("[data-keyboard-fragment]", { opacity: 0, clearProps: "transform,filter" });
-      gsap.set("[data-keyboard-energy],[data-energy-core],[data-energy-rays],[data-energy-outline]", { opacity: 0, clearProps: "transform,filter" });
-      gsap.set("[data-keyboard-pressed]", { opacity: 0, clearProps: "transform" });
-      gsap.set("[data-keyboard-idle]", { opacity: 1, clearProps: "transform" });
+      gsap.set("[data-keyboard-fragment]", { opacity: 0, x: 0, y: 0, z: 0, rotateX: 0, rotateY: 0, rotateZ: 0, scale: 1, filter: "none" });
+      gsap.set(introVideo.current, { opacity: 0, y: 0, scale: 1.012 });
+      gsap.set(pressVideo.current, { opacity: 0, y: 0, scale: 1.012 });
+      gsap.set(idleVideo.current, { opacity: 1, y: 0, scale: 1.012 });
+      gsap.set("[data-keyboard-fallback]", { opacity: 1 });
       gsap.set("[data-hero-copy-wrap],[data-space-prompt]", { opacity: 1, clearProps: "transform" });
+      gsap.set("[data-hero-flash]", { opacity: 0 });
+      gsap.set(hero.current, { "--hero-shade-opacity": 1 });
     };
 
     ScrollTrigger.create({
       id: "hero-cinematic",
       trigger: hero.current,
       start: "top top",
-      end: "+=100%",
+      // One normal wheel gesture should clear the completed story frame.
+      // Keep a short pinned runway so the handoff remains cinematic without
+      // forcing users to repeat the same scroll several times.
+      end: () => `+=${Math.max(150, Math.round(window.innerHeight * .18))}`,
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
@@ -279,6 +327,9 @@ export default function LandingExperience() {
       defaults: { ease: "power3.inOut" },
       onComplete: () => {
         entranceComplete.current = true;
+        idleVideo.current?.pause();
+        pressVideo.current?.pause();
+        gsap.set([idleVideo.current, pressVideo.current, "[data-keyboard-fallback]"], { opacity: 0 });
         setIsSpacePressed(false);
       },
     });
@@ -289,39 +340,52 @@ export default function LandingExperience() {
       .to("[data-hero-copy-wrap]", { opacity: 0, y: -28, duration: 0.9, ease: "power2.inOut" }, 0.08)
       .to(introVideo.current, { opacity: 0, duration: 0.7, ease: "power2.inOut" }, 0)
       // Beat two — compression, light response, then a deliberate hold
-      .to("[data-keyboard-idle]", { y: 11, scale: 0.996, opacity: 0, duration: 0.48, ease: "power2.in" }, 0.2)
-      .fromTo("[data-keyboard-pressed]", { opacity: 0, y: 0, scale: 1.002 }, { opacity: 1, y: 11, scale: 0.996, duration: 0.48, ease: "power2.out" }, 0.22)
-      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 0.2, duration: 0.28, ease: "sine.out" }, 0.36)
-      .to("[data-hero-flash]", { opacity: 0, duration: 0.8, ease: "sine.out" }, 0.64)
-      // The signal originates beneath the physical space bar and travels across the board
-      .to("[data-keyboard-energy]", { opacity: 1, duration: .16, ease: "power1.out" }, .48)
-      .to("[data-energy-core]", { opacity: .94, scaleX: 1, duration: .92, ease: "power2.inOut" }, .48)
-      .to("[data-energy-rays]", { opacity: .86, xPercent: 130, scaleX: 1, duration: 1.08, ease: "power2.inOut" }, .5)
-      .to("[data-energy-outline]", { opacity: .9, scale: 1, duration: .72, ease: "power2.out" }, .82)
-      .to("[data-energy-core]", { opacity: .68, filter: "brightness(1.32)", duration: .42, ease: "sine.inOut" }, 1.14)
-      .to("[data-energy-core],[data-energy-rays],[data-energy-outline]", { opacity: 0, duration: .7, ease: "sine.inOut" }, 1.42)
-      .to("[data-keyboard-energy]", { opacity: 0, duration: .12 }, 1.98)
-      .set("[data-keyboard-fragment]", { opacity: 1 }, 1.7)
-      // Beat three — pieces release from the space-bar region and fall under gravity
+      .to("[data-keyboard-fallback]", { opacity: 0, duration: 0.28, ease: "power2.inOut" }, 0.12)
+      .to(idleVideo.current, { y: 8, scale: 1.009, opacity: 0, duration: 0.34, ease: "power2.inOut" }, 0.12)
+      .fromTo(pressVideo.current, { opacity: 0, y: 4, scale: 1.01 }, { opacity: 1, y: 8, scale: 1.009, duration: 0.34, ease: "power2.inOut" }, 0.14)
+      .call(() => idleVideo.current?.pause(), [], 0.5)
+      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 0.22, duration: 0.24, ease: "sine.out" }, 0.14)
+      .to("[data-hero-flash]", { opacity: 0, duration: 0.72, ease: "sine.out" }, 0.38)
+      // Beat three — keycaps lift from their switches, then fall with individual mass and inertia
       .to("[data-keyboard-fragment]", {
-        x: (index) => ((index % 10) - 4.5) * 13 + ((index * 17) % 31) - 15,
-        y: (index) => window.innerHeight * (1.02 + Math.floor(index / 10) * .055 + ((index * 23) % 17) / 100),
-        z: (index) => 45 + (index % 6) * 28,
-        rotateX: (index) => 18 + (index % 5) * 12,
-        rotateY: (index) => ((index % 3) - 1) * 18,
-        rotateZ: (index) => ((index % 2 ? 1 : -1) * (5 + (index % 10) * 1.2)),
-        scale: (index) => 0.82 + (index % 4) * 0.035,
-        stagger: { each: 0.032, grid: [6, 10], from: 54 },
-        duration: 2.55,
+        opacity: 1,
+        duration: .16,
+        stagger: { each: .0015, from: "center" },
+        ease: "power1.out",
+      }, 1.5)
+      .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: .16, duration: .16, ease: "sine.out" }, 1.48)
+      .to("[data-hero-flash]", { opacity: 0, duration: .42, ease: "sine.out" }, 1.64)
+      .to("[data-keyboard-fragment]", {
+        y: (index) => -5 - (index % 4) * 1.5,
+        z: (index) => 22 + (index % 7) * 5,
+        rotateX: (index) => -3 - (index % 3) * 1.5,
+        rotateY: (index) => ((index % 5) - 2) * 1.4,
+        duration: .26,
+        stagger: { each: .006, from: "random" },
+        ease: "power2.out",
+      }, 1.78)
+      .to("[data-keyboard-fragment]", {
+        x: (index) => keyboardFragments[index]?.drift ?? 0,
+        y: (index) => window.innerHeight * (1.08 + (keyboardFragments[index]?.release ?? 0) * .34),
+        z: (index) => 70 + (index % 9) * 18,
+        rotateX: (index) => 38 + (index % 7) * 19,
+        rotateY: (index) => ((index % 5) - 2) * 22,
+        rotateZ: (index) => (index % 2 ? 1 : -1) * (7 + (index % 11) * 2.2),
+        scale: (index) => .84 + (index % 5) * .025,
+        filter: "brightness(.82) blur(.35px)",
+        stagger: { each: .006, from: "random" },
+        duration: 2.45,
         ease: "power2.in",
-      }, 1.72)
-      .to("[data-keyboard-fragment]", { opacity: 0, duration: .88, stagger: { each: .018, grid: [6, 10], from: 54 }, ease: "power1.in" }, 3.42)
-      .to("[data-keyboard-pressed]", { opacity: 0, y: 70, scale: .985, duration: 1.4, ease: "power2.in" }, 1.82)
+      }, 2.04)
+      .to("[data-keyboard-fragment]", { opacity: 0, duration: .62, stagger: { each: .008, from: "random" }, ease: "power1.in" }, 3.54)
+      // Transfer the solid keyboard into the individual keycaps before gravity
+      // takes over, so a second board never remains behind the falling pieces.
+      .to(pressVideo.current, { opacity: 0, y: 20, scale: 1.003, duration: .3, ease: "power2.in" }, 1.58)
       // Beat four — the next chapter arrives only after the physical action reads
-      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 1 }, { yPercent: 0, opacity: 1, duration: 1.85, ease: "expo.inOut" }, 2.62)
-      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: "power3.out" }, 3.88)
-      .fromTo("[data-curtain-copy]", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 1.12, ease: "power3.out" }, 4.05)
-      .to(hero.current, { "--hero-shade-opacity": 0, duration: 1, ease: "power1.out" }, 3.45);
+      .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 1, rotateX: -7, scale: 1.035, transformOrigin: "50% 100%" }, { yPercent: 0, opacity: 1, rotateX: 0, scale: 1, duration: 1.52, ease: "expo.inOut" }, 2.48)
+      .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: .88, ease: "power3.out" }, 3.52)
+      .fromTo("[data-curtain-copy]", { opacity: 0, y: 30, z: -90, rotateX: 5 }, { opacity: 1, y: 0, z: 0, rotateX: 0, duration: .92, ease: "power3.out" }, 3.66)
+      .to(hero.current, { "--hero-shade-opacity": 0, duration: .82, ease: "power1.out" }, 3.18);
 
     ([
       ["#top", "top"],
@@ -384,13 +448,13 @@ export default function LandingExperience() {
       scrollTrigger: {
         trigger: "#work",
         start: "top 98%",
-        end: "top 28%",
-        scrub: 1.15,
+        end: "top 62%",
+        scrub: .55,
       },
     })
-      .fromTo("[data-work-wipe]", { yPercent: 0 }, { yPercent: -104, ease: "power3.inOut" }, 0)
-      .fromTo("[data-work-heading]", { opacity: 0, y: 56 }, { opacity: 1, y: 0, ease: "power2.out" }, .2)
-      .fromTo("[data-project-rail]", { opacity: .08, y: 54, scale: .975 }, { opacity: 1, y: 0, scale: 1, ease: "power2.out" }, .28);
+      .fromTo("[data-work-wipe]", { yPercent: 0, rotateX: 0, scale: 1, transformOrigin: "50% 0%" }, { yPercent: -108, rotateX: 13, scale: .965, ease: "power3.inOut" }, 0)
+      .fromTo("[data-work-heading]", { opacity: 0, y: 64, z: -180, rotateX: 9, scale: .96 }, { opacity: 1, y: 0, z: 0, rotateX: 0, scale: 1, ease: "power3.out" }, .12)
+      .fromTo("[data-project-rail]", { opacity: .04, y: 76, z: -260, rotateX: 12, scale: .94 }, { opacity: 1, y: 0, z: 0, rotateX: 0, scale: 1, ease: "power3.out" }, .2);
 
     gsap.utils.toArray<HTMLElement>("[data-project-panel]").forEach((panel, index) => {
       gsap.from(panel, {
@@ -454,6 +518,27 @@ export default function LandingExperience() {
     });
 
     const cleanups: Array<() => void> = [];
+    let chapterExitInFlight = false;
+    const handleChapterExit = (event: WheelEvent) => {
+      if (event.deltaY <= 0 || chapterExitInFlight || !entranceComplete.current) return;
+
+      const heroBounds = hero.current?.getBoundingClientRect();
+      const workSection = document.querySelector<HTMLElement>("#work");
+      if (!heroBounds || !workSection || heroBounds.bottom <= 0 || heroBounds.top > 1) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      chapterExitInFlight = true;
+      lenis?.scrollTo(workSection, {
+        duration: .68,
+        lock: true,
+        force: true,
+        onComplete: () => { chapterExitInFlight = false; },
+      });
+    };
+    window.addEventListener("wheel", handleChapterExit, { passive: false, capture: true });
+    cleanups.push(() => window.removeEventListener("wheel", handleChapterExit, { capture: true }));
+
     gsap.utils.toArray<HTMLElement>("[data-magnetic]").forEach((element) => {
       const xTo = gsap.quickTo(element, "--magnet-x", { duration: 0.35, ease: "power3.out" });
       const yTo = gsap.quickTo(element, "--magnet-y", { duration: 0.35, ease: "power3.out" });
@@ -510,7 +595,7 @@ export default function LandingExperience() {
             <p data-hero-copy>Custom websites, built in days, directly with the people making them</p>
           </div>
 
-          <div className={styles.heroMedia} aria-hidden="true">
+          <div data-hero-media className={styles.heroMedia} aria-hidden="true">
             <video
               ref={introVideo}
               className={`${styles.heroVideo} ${videoReady ? styles.heroVideoReady : ""}`}
@@ -523,10 +608,6 @@ export default function LandingExperience() {
                 videoDecoded.current = true;
                 setVideoReady(true);
               }}
-              onTimeUpdate={(event) => {
-                const video = event.currentTarget;
-                if (video.duration && video.duration - video.currentTime < 1.05) settleIntro();
-              }}
               onEnded={settleIntro}
               onError={() => {
                 setVideoReady(false);
@@ -535,19 +616,46 @@ export default function LandingExperience() {
             >
               <source src="/hero/keyboard-intro-clean.mp4" type="video/mp4" />
             </video>
-            <div data-keyboard-idle className={styles.keyboardIdle} />
-            <div data-keyboard-pressed className={styles.keyboardPressed} />
-            <div data-keyboard-energy className={styles.keyboardEnergy}>
-              <i data-energy-rays className={styles.keyboardEnergyRays} />
-              <i data-energy-outline className={styles.keyboardEnergyOutline} />
-              <i data-energy-core className={styles.keyboardEnergyCore} />
-            </div>
+            <div data-keyboard-fallback className={styles.keyboardFallback} />
+            <video
+              ref={idleVideo}
+              data-keyboard-loop
+              className={styles.heroVideoLoop}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="/hero/keyboard-loop-poster.jpg"
+            >
+              <source src="/hero/keyboard-loop.mp4" type="video/mp4" />
+            </video>
+            <video
+              ref={pressVideo}
+              data-keyboard-press
+              className={styles.heroVideoPress}
+              muted
+              playsInline
+              preload="auto"
+              poster="/hero/keyboard-press-glow-still.jpg"
+            >
+              <source src="/hero/keyboard-press-glow.mp4" type="video/mp4" />
+            </video>
             <div className={styles.keyboardFragments}>
-              {keyboardFragments.map(({ index, column, row, left, top, backgroundPosition }) => (
+              {keyboardFragments.map(({ index, column, row, left, top, width, height, backgroundSize, backgroundPosition }) => (
                 <i
                   data-keyboard-fragment
                   key={index}
-                  style={{ left, top, backgroundPosition, "--fragment-column": column, "--fragment-row": row } as CSSProperties}
+                  style={{
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    width: `${width}%`,
+                    height: `${height}%`,
+                    backgroundSize,
+                    backgroundPosition,
+                    "--fragment-column": column,
+                    "--fragment-row": row,
+                  } as CSSProperties}
                 />
               ))}
             </div>
