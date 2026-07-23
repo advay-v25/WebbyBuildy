@@ -1,7 +1,7 @@
 import type { Transition, Variants } from "framer-motion";
 
 /**
- * Shared Framer Motion presets for WebbyBuildy.
+ * Shared Framer Motion presets for Sitesmith.
  *
  * These aren't invented values — they're extracted from the easing/spring
  * numbers already proven out across LandingExperience, BookExperience, and

@@ -3,10 +3,10 @@ import "./globals.css";
 import { LenisProvider } from "@/components/LenisProvider";
 
 export const metadata: Metadata = {
-  title: "WebbyBuildy | Web Design Studio, Mumbai",
+  title: "Sitesmith | Web Design Studio, Mumbai",
   description: "Most websites take months and cost lakhs. Yours will take days. Custom-designed websites for your brand or business, built by three people you'll actually talk to.",
   openGraph: {
-    title: "WebbyBuildy | Web Design Studio, Mumbai",
+    title: "Sitesmith | Web Design Studio, Mumbai",
     description: "Most websites take months and cost lakhs. Yours will take days.",
   },
 };

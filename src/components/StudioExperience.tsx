@@ -15,7 +15,7 @@ import { CinematicMotionField } from "@/components/CinematicMotionField";
 gsap.registerPlugin(ScrollTrigger);
 
 const founders = [
-  ["Aarav", "Aher", "Engineering", "Student at Northeastern University"],
+  ["Aarav", "Aher", "Business", "International Business at Northeastern"],
   ["Abhimanyu", "Gupta", "Aviation", "Cadet with IndiGo"],
   ["Advay", "Vaidya", "Finance", "CFA aspirant"],
 ] as const;
@@ -90,8 +90,8 @@ export function StudioExperience() {
             <p className={styles.mono}>MUMBAI / FOUNDERS</p>
             <h1>Three paths<br /><span>One studio</span></h1>
             <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now</p>
-            <p className={styles.founderSmall}>Engineering, aviation, and finance gave us three different ways of thinking WebbyBuildy is where they meet: precise systems, calm execution, and work built to perform</p>
-            <a href="#studio-manifesto" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></a>
+            <p className={styles.founderSmall}>Business, aviation, and finance gave us three different ways of thinking Sitesmith is where they meet: precise systems, calm execution, and work built to perform</p>
+            <Link href="/studio/team" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
           </div>
           <div data-studio-grid className={styles.founderGrid}>
             <div data-studio-panorama className={styles.founderPanorama} aria-hidden="true">
@@ -132,9 +132,9 @@ export function StudioExperience() {
 
         <section id="contact" className={styles.contactSection}>
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
-          <div><h2>Have something<br /><span>worth building</span></h2><a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a></div>
+          <div><h2>Have something<br /><span>worth building</span></h2><a href="mailto:studio@sitesmith.co.in" className={styles.email}>studio@sitesmith.co.in</a></div>
           <Link href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
-          <footer><span>Mumbai · India</span><span>WEBBYBUILDY © {new Date().getFullYear()}</span></footer>
+          <footer><span>Mumbai · India</span><span>SITESMITH © {new Date().getFullYear()}</span></footer>
         </section>
       </main>
     </div>

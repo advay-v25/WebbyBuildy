@@ -18,7 +18,7 @@ import { CinematicMotionField } from "@/components/CinematicMotionField";
 gsap.registerPlugin(ScrollTrigger);
 
 const founders = [
-  ["Aarav", "Aher", "Student at Northeastern University"],
+  ["Aarav", "Aher", "International Business at Northeastern"],
   ["Abhimanyu", "Gupta", "Cadet with IndiGo"],
   ["Advay", "Vaidya", "CFA aspirant"],
 ] as const;
@@ -78,7 +78,7 @@ const capabilities = [
 const projects = [
   { number: "01", title: "PlannrAI", copy: "A complete AI-powered product, designed, built and launched by the three of us", live: true, image: "/images/plannrai-hero.png", link: "https://plannrai.in" },
   { number: "02", title: "Be3", copy: "A human resources platform shaped around clearer services, stronger trust and a more confident digital presence", live: true, image: "/images/be3-hero.png", link: "https://be3.co.in" },
-  { number: "03", title: "Next project", copy: "There will be more work here soon", live: false, image: "", link: "#" },
+  { number: "03", title: "Private Consulting Website", copy: "A private consulting site that positions an individual brand", live: true, image: "/images/client3-consulting.png", link: "#" },
 ] as const;
 
 const deckPose = (index: number, active: number) => {
@@ -112,7 +112,7 @@ export default function LandingExperience() {
   const entranceComplete = useRef(false);
   const introSettled = useRef(false);
   const videoDecoded = useRef(false);
-  useLenis(() => ScrollTrigger.update());
+  const lenis = useLenis(() => ScrollTrigger.update());
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
@@ -196,6 +196,31 @@ export default function LandingExperience() {
       window.clearTimeout(fallback);
     };
   }, [settleIntro]);
+
+  // Honor a hash target on load (e.g. arriving at /#work from the book page).
+  // ScrollTrigger's pinned hero shifts section offsets, so wait for layout to
+  // settle, refresh, then jump straight to the target section.
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash || hash === "#top") return;
+    let done = false;
+
+    const goToHash = () => {
+      if (done) return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+      done = true;
+      ScrollTrigger.refresh();
+      requestAnimationFrame(() => {
+        if (lenis) lenis.scrollTo(target as HTMLElement, { immediate: true, force: true });
+        else (target as HTMLElement).scrollIntoView();
+      });
+    };
+
+    const timer = window.setTimeout(goToHash, 400);
+    document.fonts.ready.then(goToHash).catch(() => undefined);
+    return () => window.clearTimeout(timer);
+  }, [lenis]);
 
   useGSAP(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -596,8 +621,7 @@ export default function LandingExperience() {
           </div>
         </section>
 
-        <section data-capabilities data-cinematic-section className={styles.capabilitiesSection}>
-          <CinematicMotionField variant="system" />
+        <section id="process" data-capabilities data-cinematic-section className={styles.capabilitiesSection}>
           <div className={styles.capabilitiesLeft}>
             <div className={styles.capabilitiesCopy} data-capability-copy>
               <p className={styles.mono}>ONE CONTINUOUS SYSTEM</p>
@@ -644,14 +668,7 @@ export default function LandingExperience() {
           </div>
         </section>
 
-        <section data-process-bridge className={styles.processBridge}>
-          <CinematicMotionField variant="system" />
-          <p data-reveal className={styles.mono}>FROM SYSTEM TO MOTION</p>
-          <h2 data-reveal>The idea becomes a system<br /><em>Then the system moves</em></h2>
-          <span className={styles.processBridgeSignal} aria-hidden="true" />
-        </section>
-
-        <section id="process" className={styles.howItWorksSection}>
+        <section id="how-it-works" className={styles.howItWorksSection}>
           <ScrollScrubVideo />
         </section>
 
@@ -662,7 +679,7 @@ export default function LandingExperience() {
             <h2>Three paths<br /><span>One studio</span></h2>
             <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now</p>
             <p className={styles.founderSmall}>You speak directly to the people designing and building your site No account managers No hand-offs</p>
-                <Link data-magnetic href="/studio" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
+                <Link data-magnetic href="/studio/team" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
           </div>
           <div data-founder-grid data-section-stage className={styles.founderGrid}>
             <div className={styles.founderPanorama} aria-hidden="true">
@@ -692,10 +709,10 @@ export default function LandingExperience() {
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
           <div data-reveal>
             <h2>Have something<br /><span>worth building</span></h2>
-            <a href="mailto:aaravaher25@gmail.com" className={styles.email}>aaravaher25@gmail.com</a>
+            <a href="mailto:studio@sitesmith.co.in" className={styles.email}>studio@sitesmith.co.in</a>
           </div>
           <Link data-reveal data-magnetic href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
-          <footer><span>Mumbai · India</span><span>WEBBYBUILDY © {new Date().getFullYear()}</span></footer>
+          <footer><span>Mumbai · India</span><span>SITESMITH © {new Date().getFullYear()}</span></footer>
         </section>
       </main>
     </div>
