@@ -1,26 +1,90 @@
 .page {
   position: relative;
-  overflow: hidden;
   min-height: 100svh;
-  padding: clamp(5rem, 7vw, 7rem) var(--gutter) 3rem;
+  padding: clamp(9rem, 13vw, 13rem) var(--gutter) 3rem;
   display: flex;
   flex-direction: column;
 }
 
-.energyLine {
+/* --- V1 red-on-black background, scoped to this page only --- */
+.teamBackground {
   position: absolute;
+  inset: 0;
   z-index: 0;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+  overflow: hidden;
   pointer-events: none;
-  opacity: 0.65;
+  background: #09090a;
 }
 
-.energyLine rect {
-  /* Fills are defined inline with SVG Gradients */
+/* Soft red ribbon: upper-left sweeping down toward lower-centre at ~28deg.
+   Layered glow → beam → bright core → cream hairline. */
+.ribbonWrap {
+  position: absolute;
+  left: -18%;
+  top: 42vh;
+  width: 136%;
+  height: 220px;
+  transform: rotate(28deg);
+  transform-origin: center;
+}
+.ribbon {
+  position: absolute;
+  inset: 0;
+  animation: ribbonDrift 26s ease-in-out infinite;
+  will-change: transform;
+}
+.ribbon span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block;
+}
+.ribbonDeep {
+  height: 180px;
+  background: linear-gradient(90deg, transparent 2%, rgba(70, 18, 15, 0.8) 32%, rgba(70, 18, 15, 0.8) 62%, transparent 96%);
+  filter: blur(60px);
+}
+.ribbonBeam {
+  height: 32px;
+  background: linear-gradient(90deg, transparent 6%, rgba(150, 40, 31, 0.55) 34%, rgba(150, 40, 31, 0.65) 60%, transparent 95%);
+  filter: blur(11px);
+}
+.ribbonCore {
+  height: 2.5px;
+  background: linear-gradient(90deg, transparent 8%, rgba(225, 56, 45, 0.8) 30%, var(--red) 50%, rgba(225, 56, 45, 0.8) 72%, transparent 94%);
+  box-shadow: 0 0 12px rgba(225, 56, 45, 0.6);
+}
+.ribbonHair {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 26%, rgba(255, 240, 234, 0.75) 50%, transparent 76%);
+}
+
+/* Crisp (unblurred) red shards in the top-right corner. */
+.shards {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(46%, 620px);
+}
+.shardSoft { fill: #7a231b; fill-opacity: 0.26; }
+.shardMed { fill: var(--red); fill-opacity: 0.5; }
+.shardDark { fill: #2a0b09; fill-opacity: 0.9; }
+.shardAccent {
+  fill: var(--red-bright);
+  fill-opacity: 0.95;
+  animation: shardShimmer 5.5s ease-in-out infinite;
+}
+
+@keyframes ribbonDrift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(1.4%, 0.8%); }
+}
+@keyframes shardShimmer {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
 .intro {
@@ -220,6 +284,8 @@ a.contact:hover {
 }
 
 .footer {
+  position: relative;
+  z-index: 1;
   margin-top: auto;
   padding-top: 3rem;
   display: flex;
@@ -251,5 +317,30 @@ a.contact:hover {
     flex-direction: column;
     gap: 0.6rem;
     text-align: center;
+  }
+  /* Steeper, dimmer, and pushed lower so it never sits behind the stacked text. */
+  .ribbonWrap {
+    top: 58vh;
+    height: 150px;
+    transform: rotate(36deg);
+  }
+  .ribbonDeep {
+    height: 120px;
+    filter: blur(46px);
+    opacity: 0.8;
+  }
+  .shards {
+    width: 66%;
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ribbon {
+    animation: none;
+  }
+  .shardAccent {
+    animation: none;
+    opacity: 0.88;
   }
 }
