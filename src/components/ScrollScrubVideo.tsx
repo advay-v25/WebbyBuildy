@@ -327,8 +327,6 @@ export default function ScrollScrubVideo() {
         <div className={styles.gradientBottom} />
 
         <div ref={processExitRef} className={styles.processExit}>
-          <span>NEXT CHAPTER</span>
-          <strong>Three paths <em>One studio</em></strong>
         </div>
       </div>
     </section>
