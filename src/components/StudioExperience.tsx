@@ -112,7 +112,6 @@ export function StudioExperience() {
                 animate={activeFounder === index ? { y: -8, rotateY: index === 0 ? -3 : index === 2 ? 3 : 0 } : { y: 4, rotateY: 0 }}
                 whileHover={{ y: -12 }}
               >
-                <ArrowUpRight className={styles.founderPanelArrow} aria-hidden="true" />
                 <div><h2>{first} {last}</h2><p>{bio}</p><span className={styles.founderDiscipline}>{discipline}</span></div>
               </motion.article>
             ))}

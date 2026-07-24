@@ -805,7 +805,6 @@ export default function LandingExperience() {
                 key={first}
                 className={styles.founderPanel}
               >
-                <ArrowUpRight className={styles.founderPanelArrow} aria-hidden="true" />
                 <div><h3>{first} {last}</h3><p>{discipline}</p></div>
               </article>
             ))}

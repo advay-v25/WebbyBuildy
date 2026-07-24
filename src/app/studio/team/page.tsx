@@ -96,6 +96,30 @@ export default function TeamPage() {
       <SiteHeader activeSection="founders" />
 
       <main id="main-content" className={styles.page}>
+        <svg className={styles.energyLine} viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <filter id="beamBlur" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="40" />
+            </filter>
+            <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ff362a" stopOpacity="0" />
+              <stop offset="40%" stopColor="#ff6a33" stopOpacity="0.45" />
+              <stop offset="60%" stopColor="#ff362a" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#ff362a" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="beamGradFaint" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ff493d" stopOpacity="0" />
+              <stop offset="50%" stopColor="#ff2a1a" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#ff493d" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <g transform="rotate(-38 500 500)" filter="url(#beamBlur)">
+            <rect x="350" y="-500" width="160" height="2000" fill="url(#beamGrad)" />
+            <rect x="580" y="-500" width="90" height="2000" fill="url(#beamGradFaint)" />
+            <rect x="180" y="-500" width="70" height="2000" fill="url(#beamGradFaint)" />
+          </g>
+        </svg>
+
         <motion.section
           className={styles.intro}
           variants={container}
