@@ -28,9 +28,9 @@ const founders: Founder[] = [
     email: "aaravaher25@gmail.com",
     phone: "+91 98202 36834",
     bio: [
-      "I'm studying International Business at Northeastern, but I've always been the one who needs to know how things work underneath, so I taught myself to build them.",
-      "The three of us design and build every site together, start to finish, with no handing pieces off to each other.",
-      "I care most about the small details other people tend to skip.",
+      "I'm 19, studying International Business at Northeastern, and I tend to end up doing more than I was asked, whether that's turning a marketing brief into a distribution strategy or building an app because the tools I needed didn't exist.",
+      "I co-founded PlannrAI because I kept failing to plan my own days well, and it turns out most students have the same problem.",
+      "Football taught me most of what I know about reading a situation fast and making decisions without all the information, and I use that more than I expected.",
     ],
   },
   {
@@ -96,6 +96,23 @@ export default function TeamPage() {
       <SiteHeader activeSection="founders" />
 
       <main id="main-content" className={styles.page}>
+        <div className={styles.teamBackground} aria-hidden="true">
+          <div className={styles.ribbonWrap}>
+            <div className={styles.ribbon}>
+              <span className={styles.ribbonDeep} />
+              <span className={styles.ribbonBeam} />
+              <span className={styles.ribbonCore} />
+              <span className={styles.ribbonHair} />
+            </div>
+          </div>
+          <svg className={styles.shards} viewBox="0 0 600 720" preserveAspectRatio="xMaxYMid slice">
+            <polygon className={styles.shardSoft} points="558,-20 653,-20 503,740 408,740" />
+            <polygon className={styles.shardMed} points="425,-20 497,-20 347,740 275,740" />
+            <polygon className={styles.shardDark} points="516,-20 532,-20 382,740 366,740" />
+            <polygon className={styles.shardAccent} points="504,-20 509,-20 359,740 354,740" />
+          </svg>
+        </div>
+
         <motion.section
           className={styles.intro}
           variants={container}
@@ -114,8 +131,8 @@ export default function TeamPage() {
             The people<br />behind the <span>pixels</span>
           </motion.h1>
           <motion.p className={styles.lead} variants={rise}>
-            Three friends from Mumbai. You talk to them directly — no account
-            managers, no hand-offs, no agency drag.
+            Three friends from Mumbai. You talk to them directly, with no account
+            managers, no hand-offs, and no agency drag.
           </motion.p>
         </motion.section>
 

@@ -3,7 +3,7 @@ import type { Transition, Variants } from "framer-motion";
 /**
  * Shared Framer Motion presets for Sitesmith.
  *
- * These aren't invented values — they're extracted from the easing/spring
+ * These aren't invented values, they're extracted from the easing/spring
  * numbers already proven out across LandingExperience, BookExperience, and
  * StudioExperience (project cards, system nodes, booking chamber, founder
  * panels), plus the site's CSS --ease token. Reach for these in Phase 2/3
@@ -12,14 +12,14 @@ import type { Transition, Variants } from "framer-motion";
  */
 
 /** Matches the CSS `--ease` custom property in page.module.css and the
- * Book page headline entrance — the site's signature "settle in" curve. */
+ * Book page headline entrance, the site's signature "settle in" curve. */
 export const EASE_SIGNATURE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 /** Springs, named by where they're already used. */
 export const springs = {
-  /** Interactive cards that need weight — project rail, deck items. */
+  /** Interactive cards that need weight, project rail, deck items. */
   panel: { type: "spring", stiffness: 145, damping: 24, mass: 1.05 } satisfies Transition,
-  /** Selectable nodes/steps (system capabilities, process steps) — snappier, no mass tweak. */
+  /** Selectable nodes/steps (system capabilities, process steps), snappier, no mass tweak. */
   node: { type: "spring", stiffness: 190, damping: 22 } satisfies Transition,
   /** Larger surfaces entering the scene (booking chamber, modals). */
   soft: { type: "spring", stiffness: 110, damping: 22 } satisfies Transition,
@@ -34,7 +34,7 @@ export const durations = {
   slow: { duration: 0.65, ease: EASE_SIGNATURE } satisfies Transition,
 } as const;
 
-/** Fade up on enter — the most common reveal across the site (headlines, copy blocks). */
+/** Fade up on enter, the most common reveal across the site (headlines, copy blocks). */
 export const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: durations.slow },
@@ -46,7 +46,7 @@ export const fadeIn: Variants = {
   visible: { opacity: 1, transition: durations.base },
 };
 
-/** Blur + fade — matches the capabilityDisplay panel swap in LandingExperience. */
+/** Blur + fade, matches the capabilityDisplay panel swap in LandingExperience. */
 export const blurIn: Variants = {
   hidden: { opacity: 0, y: 18, filter: "blur(8px)" },
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: durations.base },
@@ -59,7 +59,7 @@ export const staggerContainer = (staggerChildren = 0.08): Variants => ({
   visible: { transition: { staggerChildren } },
 });
 
-/** Hover/tap pair for interactive cards — matches the project-rail and founder-panel lift. */
+/** Hover/tap pair for interactive cards, matches the project-rail and founder-panel lift. */
 export const cardInteraction = {
   whileHover: { y: -10, scale: 1.015 },
   whileTap: { scale: 0.985 },

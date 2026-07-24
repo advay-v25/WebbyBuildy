@@ -284,11 +284,11 @@ export default function LandingExperience() {
     });
 
     entranceTimeline.current
-      // Beat one — the interface quiets before the physical press
+      // Beat one: the interface quiets before the physical press
       .to("[data-space-prompt]", { opacity: 0, y: 14, duration: 0.55, ease: "power2.in" }, 0)
       .to("[data-hero-copy-wrap]", { opacity: 0, y: -28, duration: 0.9, ease: "power2.inOut" }, 0.08)
       .to(introVideo.current, { opacity: 0, duration: 0.7, ease: "power2.inOut" }, 0)
-      // Beat two — compression, light response, then a deliberate hold
+      // Beat two: compression, light response, then a deliberate hold
       .to("[data-keyboard-idle]", { y: 11, scale: 0.996, opacity: 0, duration: 0.48, ease: "power2.in" }, 0.2)
       .fromTo("[data-keyboard-pressed]", { opacity: 0, y: 0, scale: 1.002 }, { opacity: 1, y: 11, scale: 0.996, duration: 0.48, ease: "power2.out" }, 0.22)
       .fromTo("[data-hero-flash]", { opacity: 0 }, { opacity: 0.2, duration: 0.28, ease: "sine.out" }, 0.36)
@@ -302,7 +302,7 @@ export default function LandingExperience() {
       .to("[data-energy-core],[data-energy-rays],[data-energy-outline]", { opacity: 0, duration: .7, ease: "sine.inOut" }, 1.42)
       .to("[data-keyboard-energy]", { opacity: 0, duration: .12 }, 1.98)
       .set("[data-keyboard-fragment]", { opacity: 1 }, 1.7)
-      // Beat three — pieces release from the space-bar region and fall under gravity
+      // Beat three: pieces release from the space-bar region and fall under gravity
       .to("[data-keyboard-fragment]", {
         x: (index) => ((index % 10) - 4.5) * 13 + ((index * 17) % 31) - 15,
         y: (index) => window.innerHeight * (1.02 + Math.floor(index / 10) * .055 + ((index * 23) % 17) / 100),
@@ -317,7 +317,7 @@ export default function LandingExperience() {
       }, 1.72)
       .to("[data-keyboard-fragment]", { opacity: 0, duration: .88, stagger: { each: .018, grid: [6, 10], from: 54 }, ease: "power1.in" }, 3.42)
       .to("[data-keyboard-pressed]", { opacity: 0, y: 70, scale: .985, duration: 1.4, ease: "power2.in" }, 1.82)
-      // Beat four — the next chapter arrives only after the physical action reads
+      // Beat four: the next chapter arrives only after the physical action reads
       .fromTo("[data-story-curtain]", { yPercent: 100, opacity: 1 }, { yPercent: 0, opacity: 1, duration: 1.85, ease: "expo.inOut" }, 2.62)
       .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: "power3.out" }, 3.88)
       .fromTo("[data-curtain-copy]", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 1.12, ease: "power3.out" }, 4.05)
@@ -563,7 +563,7 @@ export default function LandingExperience() {
             <div data-curtain-line className={styles.curtainLine} />
             <div data-curtain-copy>
               <strong>Built to be used<br /><em>Designed to be felt</em></strong>
-              <p>Strategy, design, development and motion — without the agency drag</p>
+              <p>Strategy, design, development and motion, without the agency drag</p>
             </div>
           </div>
         </section>
