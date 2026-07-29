@@ -248,6 +248,15 @@ export default function ScrollScrubVideo() {
       // Animate a dummy object just to keep the timeline active
       tl.to({}, { duration: 1 });
 
+      // Recompute the pin spacer after layout settles and whenever the viewport
+      // changes (rotating a phone/iPad, or mobile browser chrome resizing the
+      // svh). Without this the pin spacer can be sized against stale dimensions,
+      // which shows up as an empty gap after the section (Phase 6).
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      const handleResize = () => ScrollTrigger.refresh();
+      window.addEventListener("resize", handleResize);
+      window.addEventListener("orientationchange", handleResize);
+
       // Cursor parallax update loop (desktop only)
       let rafId: number;
       if (!isTouchDevice && !reducedMotion && stage) {
@@ -263,6 +272,8 @@ export default function ScrollScrubVideo() {
       return () => {
         tl.kill();
         if (rafId) cancelAnimationFrame(rafId);
+        window.removeEventListener("resize", handleResize);
+        window.removeEventListener("orientationchange", handleResize);
         gsap.set([stage, heading, grain], { clearProps: "all" });
       };
     },
@@ -281,6 +292,7 @@ export default function ScrollScrubVideo() {
             preload="auto"
             poster="/videos/how-it-works-poster.jpg"
             controls
+            {...{ "webkit-playsinline": "true" }}
           >
             <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
           </video>
@@ -305,6 +317,7 @@ export default function ScrollScrubVideo() {
             playsInline
             preload="auto"
             poster="/videos/how-it-works-poster.jpg"
+            {...{ "webkit-playsinline": "true" }}
           >
             <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
           </video>

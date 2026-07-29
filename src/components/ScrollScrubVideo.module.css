@@ -259,6 +259,23 @@
   }
 }
 
+/* Touch / small screens: show the WHOLE frame, fit to the viewport.
+   `contain` + black letterboxing means nothing is ever cropped while scrubbing,
+   and svh keeps the pinned panel matched to the visible viewport so mobile
+   browser chrome does not leave a gap after the section. */
+@media (hover: none) and (pointer: coarse), (max-width: 800px) {
+  .videoElement {
+    object-fit: contain;
+    background: #000;
+  }
+  .videoPanel {
+    height: 100svh;
+  }
+  .track {
+    height: 300vh;
+  }
+}
+
 /* Prefers reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .loadingPlaceholder {

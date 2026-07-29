@@ -96,30 +96,46 @@ const fragmentRows = [
   { top: 65.9, left: 12.2, count: 17, gap: 4.48, width: 3.78, height: 7 },
 ] as const;
 
-const keyboardFragments = fragmentRows.flatMap((row, rowIndex) =>
-  Array.from({ length: row.count }, (_, column) => {
-    const index = fragmentRows.slice(0, rowIndex).reduce((sum, item) => sum + item.count, 0) + column;
-    const left = row.left + column * row.gap;
-    const seed = ((index * 47 + 19) % 101) / 101;
-    return {
-      index,
-      column,
-      row: rowIndex,
-      left,
-      top: row.top,
-      width: row.width,
-      height: row.height,
-      release: seed * .22 + rowIndex * .025,
-      drift: (seed - .5) * 90,
-      backgroundSize: `${10000 / row.width}% ${10000 / row.height}%`,
-      backgroundPosition: `${(left / (100 - row.width)) * 100}% ${(row.top / (100 - row.height)) * 100}%`,
-    };
-  }),
-);
+type FragmentRow = { top: number; left: number; count: number; gap: number; width: number; height: number };
+
+const buildFragments = (rows: readonly FragmentRow[], driftScale: number) =>
+  rows.flatMap((row, rowIndex) =>
+    Array.from({ length: row.count }, (_, column) => {
+      const index = rows.slice(0, rowIndex).reduce((sum, item) => sum + item.count, 0) + column;
+      const left = row.left + column * row.gap;
+      const seed = ((index * 47 + 19) % 101) / 101;
+      return {
+        index,
+        column,
+        row: rowIndex,
+        left,
+        top: row.top,
+        width: row.width,
+        height: row.height,
+        release: seed * .22 + rowIndex * .025,
+        drift: (seed - .5) * driftScale,
+        backgroundSize: `${10000 / row.width}% ${10000 / row.height}%`,
+        backgroundPosition: `${(left / (100 - row.width)) * 100}% ${(row.top / (100 - row.height)) * 100}%`,
+      };
+    }),
+  );
+
+const keyboardFragments = buildFragments(fragmentRows, 90);
+
+// Touch / small screens get a far sparser board with tighter horizontal drift so
+// no keycap crosses the viewport edge and the exit reads cleanly at phone width.
+const fragmentRowsTouch: readonly FragmentRow[] = [
+  { top: 38, left: 15, count: 6, gap: 11.8, width: 7.4, height: 12.5 },
+  { top: 52, left: 13, count: 7, gap: 10.9, width: 7.4, height: 12.5 },
+  { top: 66, left: 17, count: 6, gap: 11.4, width: 7.4, height: 12.5 },
+];
+const keyboardFragmentsTouch = buildFragments(fragmentRowsTouch, 24);
 
 export default function LandingExperience() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLElement>(null);
+  const projectRail = useRef<HTMLDivElement>(null);
+  const suppressRailSync = useRef(false);
   const introVideo = useRef<HTMLVideoElement>(null);
   const idleVideo = useRef<HTMLVideoElement>(null);
   const pressVideo = useRef<HTMLVideoElement>(null);
@@ -132,11 +148,15 @@ export default function LandingExperience() {
   const lenis = useLenis(() => ScrollTrigger.update());
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
   const [activeCapability, setActiveCapability] = useState(0);
   const [hoveredCapability, setHoveredCapability] = useState<number | null>(null);
   const [activeFounder, setActiveFounder] = useState(0);
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
+
+  // Touch/small-screen variant of the keyboard scatter (Phase 2).
+  const fragments = isTouch ? keyboardFragmentsTouch : keyboardFragments;
 
   const enterSite = useCallback(() => {
     if (entranceComplete.current || entranceTimeline.current?.isActive()) return;
@@ -181,6 +201,65 @@ export default function LandingExperience() {
   const moveProject = useCallback((direction: -1 | 1) => {
     setActiveProject((current) => (current + direction + projects.length) % projects.length);
   }, []);
+
+  // Detect touch / small screens once mounted so the desktop string renders on
+  // the server and only swaps after hydration (no mismatch). iPads report a
+  // coarse pointer even in landscape past 800px, hence the pointer query.
+  useEffect(() => {
+    const coarse = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const compute = () => setIsTouch(coarse.matches || window.innerWidth <= 800);
+    compute();
+    coarse.addEventListener("change", compute);
+    window.addEventListener("resize", compute);
+    window.addEventListener("orientationchange", compute);
+    return () => {
+      coarse.removeEventListener("change", compute);
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("orientationchange", compute);
+    };
+  }, []);
+
+  // On touch the work deck is a native scroll-snap carousel. Keep the prev/next
+  // arrows and the 01/03 counter working by scrolling the rail to the active
+  // card whenever the index changes through the controls (not through a swipe).
+  useEffect(() => {
+    if (!isTouch) return;
+    const rail = projectRail.current;
+    if (!rail) return;
+    if (suppressRailSync.current) { suppressRailSync.current = false; return; }
+    const card = rail.querySelectorAll<HTMLElement>("[data-project-panel]")[activeProject];
+    if (!card) return;
+    rail.scrollTo({ left: card.offsetLeft - (rail.clientWidth - card.clientWidth) / 2, behavior: "smooth" });
+  }, [activeProject, isTouch]);
+
+  // Reflect swipes back into the counter/arrow state by snapping the index to
+  // whichever card is nearest the rail centre.
+  useEffect(() => {
+    if (!isTouch) return;
+    const rail = projectRail.current;
+    if (!rail) return;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const cards = Array.from(rail.querySelectorAll<HTMLElement>("[data-project-panel]"));
+        const center = rail.scrollLeft + rail.clientWidth / 2;
+        let nearest = 0;
+        let best = Infinity;
+        cards.forEach((card, index) => {
+          const distance = Math.abs(card.offsetLeft + card.clientWidth / 2 - center);
+          if (distance < best) { best = distance; nearest = index; }
+        });
+        setActiveProject((current) => {
+          if (current === nearest) return current;
+          suppressRailSync.current = true;
+          return nearest;
+        });
+      });
+    };
+    rail.addEventListener("scroll", onScroll, { passive: true });
+    return () => { rail.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, [isTouch]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -227,8 +306,13 @@ export default function LandingExperience() {
     }, 4200);
     document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
 
+    // Rotating a phone/iPad changes svh and pin math; recompute every pin.
+    const onOrientation = () => ScrollTrigger.refresh();
+    window.addEventListener("orientationchange", onOrientation);
+
     return () => {
       window.clearTimeout(fallback);
+      window.removeEventListener("orientationchange", onOrientation);
     };
   }, [settleIntro]);
 
@@ -365,8 +449,8 @@ export default function LandingExperience() {
         ease: "power2.out",
       }, 1.78)
       .to("[data-keyboard-fragment]", {
-        x: (index) => keyboardFragments[index]?.drift ?? 0,
-        y: (index) => window.innerHeight * (1.08 + (keyboardFragments[index]?.release ?? 0) * .34),
+        x: (index) => fragments[index]?.drift ?? 0,
+        y: (index) => window.innerHeight * (1.08 + (fragments[index]?.release ?? 0) * .34),
         z: (index) => 70 + (index % 9) * 18,
         rotateX: (index) => 38 + (index % 7) * 19,
         rotateY: (index) => ((index % 5) - 2) * 22,
@@ -427,7 +511,10 @@ export default function LandingExperience() {
       .from("[data-capability-note]", { opacity: 0, y: 30, duration: 0.2 }, 0.62);
 
     const desktopMotion = gsap.matchMedia();
-    desktopMotion.add("(min-width: 801px)", () => {
+    // Require a fine pointer so coarse-pointer tablets (iPad, incl. landscape
+    // past 800px) fall through to the touch context below instead of getting
+    // the desktop pin. A real mouse desktop is unaffected.
+    desktopMotion.add("(min-width: 801px) and (hover: hover) and (pointer: fine)", () => {
       const capabilityLock = ScrollTrigger.create({
         id: "capability-cinematic-lock",
         trigger: "[data-capabilities]",
@@ -442,6 +529,24 @@ export default function LandingExperience() {
         },
       });
       return () => capabilityLock.kill();
+    });
+    // Parallel touch context (Phase 4): pin the same section and step through the
+    // four modules on swipe. Shorter pin runway than desktop so it isn't endless.
+    desktopMotion.add("(max-width: 800px), (hover: none) and (pointer: coarse)", () => {
+      const capabilityLockTouch = ScrollTrigger.create({
+        id: "capability-cinematic-lock-touch",
+        trigger: "[data-capabilities]",
+        start: "top top",
+        end: "+=120%",
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: ({ progress }) => {
+          setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
+        },
+      });
+      return () => capabilityLockTouch.kill();
     });
 
     gsap.timeline({
@@ -482,33 +587,39 @@ export default function LandingExperience() {
       });
     });
 
-    gsap.utils.toArray<HTMLElement>("[data-section-stage]").forEach((stage) => {
-      gsap.fromTo(stage, { y: 88, scale: .955, rotateX: 7, transformOrigin: "50% 100%" }, {
-        y: 0,
-        scale: 1,
-        rotateX: 0,
-        ease: "none",
-        scrollTrigger: { trigger: stage, start: "top 94%", end: "top 55%", scrub: 1 },
+    // These scroll-driven transforms target the founder grid and the pinned
+    // capability stage, both of which own their own layout on touch (native
+    // carousel / scroll pin). Keep them desktop-only so they don't fight the
+    // native scroll or the touch pin. Desktop behaviour is unchanged.
+    if (!isTouch) {
+      gsap.utils.toArray<HTMLElement>("[data-section-stage]").forEach((stage) => {
+        gsap.fromTo(stage, { y: 88, scale: .955, rotateX: 7, transformOrigin: "50% 100%" }, {
+          y: 0,
+          scale: 1,
+          rotateX: 0,
+          ease: "none",
+          scrollTrigger: { trigger: stage, start: "top 94%", end: "top 55%", scrub: 1 },
+        });
       });
-    });
 
-    gsap.fromTo("[data-founder-panel]", {
-      opacity: 0,
-      clipPath: "inset(0 100% 0 0 round 26px)",
-    }, {
-      opacity: 1,
-      clipPath: "inset(0 0% 0 0 round 26px)",
-      stagger: 0.08,
-      ease: "none",
-      scrollTrigger: { trigger: "[data-founder-grid]", start: "top 94%", end: "top 56%", scrub: 0.75 },
-    });
+      gsap.fromTo("[data-founder-panel]", {
+        opacity: 0,
+        clipPath: "inset(0 100% 0 0 round 26px)",
+      }, {
+        opacity: 1,
+        clipPath: "inset(0 0% 0 0 round 26px)",
+        stagger: 0.08,
+        ease: "none",
+        scrollTrigger: { trigger: "[data-founder-grid]", start: "top 94%", end: "top 56%", scrub: 0.75 },
+      });
 
-    ScrollTrigger.create({
-      trigger: "[data-founder-grid]",
-      start: "top 88%",
-      end: "bottom 46%",
-      onUpdate: ({ progress }) => setActiveFounder(Math.min(founders.length - 1, Math.floor(progress * founders.length))),
-    });
+      ScrollTrigger.create({
+        trigger: "[data-founder-grid]",
+        start: "top 88%",
+        end: "bottom 46%",
+        onUpdate: ({ progress }) => setActiveFounder(Math.min(founders.length - 1, Math.floor(progress * founders.length))),
+      });
+    }
 
     gsap.fromTo("[data-contact-arch]", { scaleY: 0.08, yPercent: 46 }, {
       scaleY: 1,
@@ -577,7 +688,7 @@ export default function LandingExperience() {
       desktopMotion.revert();
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, { scope: root });
+  }, { scope: root, dependencies: [isTouch] });
 
   return (
     <div ref={root} className={styles.site}>
@@ -585,7 +696,7 @@ export default function LandingExperience() {
       <SiteHeader activeSection={activeSection} />
 
       <main id="main-content">
-        <section id="top" ref={hero} className={styles.hero}>
+        <section id="top" ref={hero} className={styles.hero} onClick={isTouch ? () => enterSite() : undefined}>
           <div data-hero-copy-wrap className={styles.heroCopy}>
             <h1 aria-label="Websites that move at the speed of your idea">
               <span className={styles.lineClip}><span data-hero-line>Websites that move</span></span>
@@ -642,7 +753,7 @@ export default function LandingExperience() {
               <source src="/hero/keyboard-press-glow.mp4" type="video/mp4" />
             </video>
             <div className={styles.keyboardFragments}>
-              {keyboardFragments.map(({ index, column, row, left, top, width, height, backgroundSize, backgroundPosition }) => (
+              {fragments.map(({ index, column, row, left, top, width, height, backgroundSize, backgroundPosition }) => (
                 <i
                   data-keyboard-fragment
                   key={index}
@@ -663,7 +774,7 @@ export default function LandingExperience() {
           </div>
 
           <button data-space-prompt className={`${styles.spacePrompt} ${isSpacePressed ? styles.spacePressed : ""}`} onClick={enterSite}>
-            <span ref={spaceKey} className={styles.spaceKey}>PRESS SPACE TO ENTER</span>
+            <span ref={spaceKey} className={styles.spaceKey}>{isTouch ? "TAP TO ENTER" : "PRESS SPACE TO ENTER"}</span>
             <span className={styles.scrollLabel}>or scroll to explore <ArrowDownRight size={14} /></span>
           </button>
 
@@ -690,7 +801,7 @@ export default function LandingExperience() {
               </div>
             </div>
           </div>
-          <div data-project-rail className={styles.projectRail}>
+          <div data-project-rail ref={projectRail} className={styles.projectRail}>
             {projects.map((project, index) => (
               <motion.article
                 data-project-panel
@@ -704,9 +815,9 @@ export default function LandingExperience() {
                 onClick={() => setActiveProject(index)}
                 key={project.number}
                 className={`${styles.projectPanel} ${project.live ? styles.liveProject : styles.futureProject}`}
-                animate={deckPose(index, activeProject)}
-                whileHover={activeProject === index ? { y: -12, rotateX: -2.5, rotateY: 2.5, scale: 1.018 } : { y: 12, opacity: .74 }}
-                whileTap={{ scale: .985 }}
+                animate={isTouch ? { x: 0, y: 0, scale: 1, rotateY: 0, opacity: 1 } : deckPose(index, activeProject)}
+                whileHover={isTouch ? undefined : (activeProject === index ? { y: -12, rotateX: -2.5, rotateY: 2.5, scale: 1.018 } : { y: 12, opacity: .74 })}
+                whileTap={isTouch ? undefined : { scale: .985 }}
                 transition={{ type: "spring", stiffness: 145, damping: 24, mass: 1.05 }}
               >
                 {project.live ? (

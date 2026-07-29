@@ -7,7 +7,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CinematicMotionField } from "@/components/CinematicMotionField";
@@ -23,6 +23,21 @@ const founders = [
 export function StudioExperience() {
   const root = useRef<HTMLDivElement>(null);
   const [activeFounder, setActiveFounder] = useState(0);
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    const coarse = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const compute = () => setIsTouch(coarse.matches || window.innerWidth <= 800);
+    compute();
+    coarse.addEventListener("change", compute);
+    window.addEventListener("resize", compute);
+    window.addEventListener("orientationchange", compute);
+    return () => {
+      coarse.removeEventListener("change", compute);
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("orientationchange", compute);
+    };
+  }, []);
 
   useGSAP(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -48,18 +63,24 @@ export function StudioExperience() {
       duration: 1.4,
       ease: "power3.out",
     });
-    gsap.fromTo("[data-studio-grid]", { rotateY: 3, xPercent: 2 }, {
-      rotateY: -3,
-      xPercent: -2,
-      ease: "none",
-      scrollTrigger: { trigger: "[data-studio-grid]", start: "top 78%", end: "bottom 24%", scrub: 1 },
-    });
-    ScrollTrigger.create({
-      trigger: "[data-studio-grid]",
-      start: "top 68%",
-      end: "bottom 38%",
-      onUpdate: ({ progress }) => setActiveFounder(Math.min(founders.length - 1, Math.floor(progress * founders.length))),
-    });
+    // The grid is a native scroll-snap carousel on touch (Phase 7). A scroll-
+    // driven transform on it and a scroll-driven active index both fight the
+    // swipe (snapping the user forward and blocking the reverse gesture), so
+    // keep them desktop-only. Native scroll-snap owns the touch interaction.
+    if (!isTouch) {
+      gsap.fromTo("[data-studio-grid]", { rotateY: 3, xPercent: 2 }, {
+        rotateY: -3,
+        xPercent: -2,
+        ease: "none",
+        scrollTrigger: { trigger: "[data-studio-grid]", start: "top 78%", end: "bottom 24%", scrub: 1 },
+      });
+      ScrollTrigger.create({
+        trigger: "[data-studio-grid]",
+        start: "top 68%",
+        end: "bottom 38%",
+        onUpdate: ({ progress }) => setActiveFounder(Math.min(founders.length - 1, Math.floor(progress * founders.length))),
+      });
+    }
     gsap.from("[data-manifesto]", {
       opacity: 0,
       y: 70,
@@ -78,7 +99,7 @@ export function StudioExperience() {
       ease: "none",
       scrollTrigger: { trigger: "#contact", start: "top 92%", end: "top 34%", scrub: .9 },
     });
-  }, { scope: root });
+  }, { scope: root, dependencies: [isTouch] });
 
   return (
     <div ref={root} className={styles.site}>
@@ -101,7 +122,7 @@ export function StudioExperience() {
               <motion.article
                 data-studio-founder
                 data-active={activeFounder === index}
-                layout
+                layout={!isTouch}
                 tabIndex={0}
                 onMouseEnter={() => setActiveFounder(index)}
                 onFocus={() => setActiveFounder(index)}
@@ -109,8 +130,8 @@ export function StudioExperience() {
                 key={first}
                 className={styles.founderPanel}
                 transition={{ layout: { type: "spring", stiffness: 150, damping: 24 } }}
-                animate={activeFounder === index ? { y: -8, rotateY: index === 0 ? -3 : index === 2 ? 3 : 0 } : { y: 4, rotateY: 0 }}
-                whileHover={{ y: -12 }}
+                animate={isTouch ? undefined : (activeFounder === index ? { y: -8, rotateY: index === 0 ? -3 : index === 2 ? 3 : 0 } : { y: 4, rotateY: 0 })}
+                whileHover={isTouch ? undefined : { y: -12 }}
               >
                 <div><h2>{first} {last}</h2><p>{bio}</p><span className={styles.founderDiscipline}>{discipline}</span></div>
               </motion.article>
