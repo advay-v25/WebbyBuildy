@@ -123,6 +123,11 @@ export default function LandingExperience() {
 
   const enterSite = useCallback(() => {
     if (entranceComplete.current || entranceTimeline.current?.isActive()) return;
+    // The entrance now owns the keyboard + video. Mark the intro settled and
+    // kill any in-flight settle tween so settleIntro can't re-reveal the idle
+    // keyboard mid-shatter if the intro video ends while the entrance plays.
+    introSettled.current = true;
+    gsap.killTweensOf("[data-keyboard-idle]");
     setIsSpacePressed(true);
     if (spaceKey.current) {
       animate(spaceKey.current, {
@@ -138,6 +143,9 @@ export default function LandingExperience() {
 
   const settleIntro = useCallback(() => {
     if (introSettled.current) return;
+    // Never fight the entrance: if the user has already pressed Space / scrolled
+    // to enter, settling would re-reveal the idle keyboard over the shatter.
+    if (entranceComplete.current || entranceTimeline.current?.isActive()) return;
     introSettled.current = true;
     gsap.to(introVideo.current, { opacity: 0, duration: 1.05, ease: "power2.inOut" });
     gsap.to("[data-keyboard-idle]", { opacity: 1, duration: 1.05, ease: "power2.inOut" });

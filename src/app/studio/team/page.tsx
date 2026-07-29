@@ -105,10 +105,8 @@ export default function TeamPage() {
               <span className={styles.ribbonHair} />
             </div>
           </div>
+          {/* A single restrained crisp accent line in the top-right. */}
           <svg className={styles.shards} viewBox="0 0 600 720" preserveAspectRatio="xMaxYMid slice">
-            <polygon className={styles.shardSoft} points="558,-20 653,-20 503,740 408,740" />
-            <polygon className={styles.shardMed} points="425,-20 497,-20 347,740 275,740" />
-            <polygon className={styles.shardDark} points="516,-20 532,-20 382,740 366,740" />
             <polygon className={styles.shardAccent} points="504,-20 509,-20 359,740 354,740" />
           </svg>
         </div>

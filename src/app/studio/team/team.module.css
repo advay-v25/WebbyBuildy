@@ -6,9 +6,11 @@
   flex-direction: column;
 }
 
-/* --- V1 red-on-black background, scoped to this page only --- */
+/* --- Red-on-black background: ONE fixed full-viewport backdrop, scoped to
+   this page. It stays put while content scrolls over it, so the same calm
+   composition sits behind the top and bottom of the page alike. --- */
 .teamBackground {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
@@ -30,8 +32,6 @@
 .ribbon {
   position: absolute;
   inset: 0;
-  animation: ribbonDrift 26s ease-in-out infinite;
-  will-change: transform;
 }
 .ribbon span {
   position: absolute;
@@ -55,13 +55,15 @@
   height: 2.5px;
   background: linear-gradient(90deg, transparent 8%, rgba(225, 56, 45, 0.8) 30%, var(--red) 50%, rgba(225, 56, 45, 0.8) 72%, transparent 94%);
   box-shadow: 0 0 12px rgba(225, 56, 45, 0.6);
+  /* Very slow, faint sheen on the core only. No scroll-linked motion. */
+  animation: ribbonSheen 9s ease-in-out infinite;
 }
 .ribbonHair {
   height: 1px;
   background: linear-gradient(90deg, transparent 26%, rgba(255, 240, 234, 0.75) 50%, transparent 76%);
 }
 
-/* Crisp (unblurred) red shards in the top-right corner. */
+/* Single crisp (unblurred) red accent line in the top-right corner. */
 .shards {
   position: absolute;
   top: 0;
@@ -69,21 +71,13 @@
   height: 100%;
   width: min(46%, 620px);
 }
-.shardSoft { fill: #7a231b; fill-opacity: 0.26; }
-.shardMed { fill: var(--red); fill-opacity: 0.5; }
-.shardDark { fill: #2a0b09; fill-opacity: 0.9; }
 .shardAccent {
   fill: var(--red-bright);
-  fill-opacity: 0.95;
-  animation: shardShimmer 5.5s ease-in-out infinite;
+  fill-opacity: 0.82;
 }
 
-@keyframes ribbonDrift {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(1.4%, 0.8%); }
-}
-@keyframes shardShimmer {
-  0%, 100% { opacity: 0.7; }
+@keyframes ribbonSheen {
+  0%, 100% { opacity: 0.85; }
   50% { opacity: 1; }
 }
 
@@ -321,26 +315,26 @@ a.contact:hover {
   /* Steeper, dimmer, and pushed lower so it never sits behind the stacked text. */
   .ribbonWrap {
     top: 58vh;
-    height: 150px;
+    height: 130px;
     transform: rotate(36deg);
   }
   .ribbonDeep {
-    height: 120px;
+    height: 110px;
     filter: blur(46px);
+    opacity: 0.72;
+  }
+  .ribbonBeam {
     opacity: 0.8;
   }
   .shards {
-    width: 66%;
-    opacity: 0.7;
+    width: 58%;
+    opacity: 0.6;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ribbon {
+  .ribbonCore {
     animation: none;
-  }
-  .shardAccent {
-    animation: none;
-    opacity: 0.88;
+    opacity: 0.92;
   }
 }
