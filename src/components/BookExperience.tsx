@@ -15,14 +15,14 @@ import { CALENDLY_URL } from "@/lib/constants";
 gsap.registerPlugin(ScrollTrigger);
 
 // Each window is anchored to an hour. Its position on the wheel is the
-// clock-face angle for that hour — (hour % 12) * 30° measured clockwise from
+// clock-face angle for that hour, (hour % 12) * 30 degrees measured clockwise from
 // 12 o'clock: Morning 09:00 → 9 o'clock (left), Afternoon 12:00 → 12 o'clock
 // (top), Evening 16:00 → 4 o'clock (lower-right). Badges are fixed anchors:
 // hover only changes their highlight, never their position.
 const callWindows = [
-  { label: "Morning", time: "09:00 — 12:00", hour: 9, icon: Sunrise },
-  { label: "Afternoon", time: "12:00 — 16:00", hour: 12, icon: Sun },
-  { label: "Evening", time: "16:00 — 19:00", hour: 16, icon: Moon },
+  { label: "Morning", time: "09:00 to 12:00", hour: 9, icon: Sunrise },
+  { label: "Afternoon", time: "12:00 to 16:00", hour: 12, icon: Sun },
+  { label: "Evening", time: "16:00 to 19:00", hour: 16, icon: Moon },
 ] as const;
 
 function windowAngle(hour: number): CSSProperties {

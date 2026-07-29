@@ -28,9 +28,9 @@ const founders: Founder[] = [
     email: "aaravaher25@gmail.com",
     phone: "+91 98202 36834",
     bio: [
-      "I'm studying International Business at Northeastern, but I've always been the one who needs to know how things work underneath, so I taught myself to build them.",
-      "The three of us design and build every site together, start to finish, with no handing pieces off to each other.",
-      "I care most about the small details other people tend to skip.",
+      "I'm 19, studying International Business at Northeastern, and I tend to end up doing more than I was asked, whether that's turning a marketing brief into a distribution strategy or building an app because the tools I needed didn't exist.",
+      "I co-founded PlannrAI because I kept failing to plan my own days well, and it turns out most students have the same problem.",
+      "Football taught me most of what I know about reading a situation fast and making decisions without all the information, and I use that more than I expected.",
     ],
   },
   {
@@ -96,29 +96,20 @@ export default function TeamPage() {
       <SiteHeader activeSection="founders" />
 
       <main id="main-content" className={styles.page}>
-        <svg className={styles.energyLine} viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <filter id="beamBlur" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="40" />
-            </filter>
-            <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#ff362a" stopOpacity="0" />
-              <stop offset="40%" stopColor="#ff6a33" stopOpacity="0.45" />
-              <stop offset="60%" stopColor="#ff362a" stopOpacity="0.45" />
-              <stop offset="100%" stopColor="#ff362a" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="beamGradFaint" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#ff493d" stopOpacity="0" />
-              <stop offset="50%" stopColor="#ff2a1a" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#ff493d" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <g transform="rotate(-38 500 500)" filter="url(#beamBlur)">
-            <rect x="350" y="-500" width="160" height="2000" fill="url(#beamGrad)" />
-            <rect x="580" y="-500" width="90" height="2000" fill="url(#beamGradFaint)" />
-            <rect x="180" y="-500" width="70" height="2000" fill="url(#beamGradFaint)" />
-          </g>
-        </svg>
+        <div className={styles.teamBackground} aria-hidden="true">
+          <div className={styles.ribbonWrap}>
+            <div className={styles.ribbon}>
+              <span className={styles.ribbonDeep} />
+              <span className={styles.ribbonBeam} />
+              <span className={styles.ribbonCore} />
+              <span className={styles.ribbonHair} />
+            </div>
+          </div>
+          {/* A single restrained crisp accent line in the top-right. */}
+          <svg className={styles.shards} viewBox="0 0 600 720" preserveAspectRatio="xMaxYMid slice">
+            <polygon className={styles.shardAccent} points="504,-20 509,-20 359,740 354,740" />
+          </svg>
+        </div>
 
         <motion.section
           className={styles.intro}
@@ -138,8 +129,8 @@ export default function TeamPage() {
             The people<br />behind the <span>pixels</span>
           </motion.h1>
           <motion.p className={styles.lead} variants={rise}>
-            Three friends from Mumbai. You talk to them directly — no account
-            managers, no hand-offs, no agency drag.
+            Three friends from Mumbai. You talk to them directly, with no account
+            managers, no hand-offs, and no agency drag.
           </motion.p>
         </motion.section>
 

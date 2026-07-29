@@ -14,8 +14,8 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
 
   return (
     <header className={styles.header} data-active-section={activeSection}>
-      {/* Plain anchor (not next/link) so it does a full navigation to "/" —
-          this resets the hero to its pre-animation, SPACE-gated first-visit
+      {/* Plain anchor (not next/link) so it does a full navigation to "/".
+          This resets the hero to its pre-animation, SPACE-gated first-visit
           state from every page, and lands at the absolute top with no hash. */}
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/" className={styles.wordmark} aria-label="Sitesmith home" onClick={closeMenu}>

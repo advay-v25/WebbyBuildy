@@ -671,7 +671,7 @@ export default function LandingExperience() {
             <div data-curtain-line className={styles.curtainLine} />
             <div data-curtain-copy>
               <strong>Built to be used<br /><em>Designed to be felt</em></strong>
-              <p>Strategy, design, development and motion — without the agency drag</p>
+              <p>Strategy, design, development and motion, without the agency drag</p>
             </div>
           </div>
         </section>
