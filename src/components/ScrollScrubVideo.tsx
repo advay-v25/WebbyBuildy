@@ -78,14 +78,16 @@ export default function ScrollScrubVideo() {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleLoadedMetadata = () => {
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-    };
+    // Video readiness does not change layout, so these handlers must NOT call
+    // ScrollTrigger.refresh(): on mobile they fire late — typically while the
+    // user is already scrolling into the pinned section — and a refresh then
+    // recalculates every trigger's start/end and pin spacing, remapping the
+    // scroll position and desyncing the pin.
+    const handleLoadedMetadata = () => {};
 
     const handleLoadedData = () => {
       video.currentTime = 0;
       setIsVideoReady(true);
-      requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
     const handleSeeked = () => {
@@ -280,12 +282,15 @@ export default function ScrollScrubVideo() {
       // Animate a dummy object just to keep the timeline active
       tl.to({}, { duration: 1 });
 
-      // Recompute the pin spacer after layout settles and whenever the viewport
-      // changes (rotating a phone/iPad, or mobile browser chrome resizing the
-      // svh). Without this the pin spacer can be sized against stale dimensions,
-      // which shows up as an empty gap after the section (Phase 6).
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-      const handleResize = () => ScrollTrigger.refresh();
+      // Recompute pin spacing only on genuine layout changes (resize / rotate),
+      // debounced. No mount refresh here: cross-component pin ordering is
+      // reconciled by the fonts.ready refresh in LandingExperience, and a
+      // mid-scroll refresh would desync the pin.
+      let refreshTimer: number | undefined;
+      const handleResize = () => {
+        window.clearTimeout(refreshTimer);
+        refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+      };
       window.addEventListener("resize", handleResize);
       window.addEventListener("orientationchange", handleResize);
 
@@ -304,6 +309,7 @@ export default function ScrollScrubVideo() {
       return () => {
         tl.kill();
         if (rafId) cancelAnimationFrame(rafId);
+        window.clearTimeout(refreshTimer);
         window.removeEventListener("resize", handleResize);
         window.removeEventListener("orientationchange", handleResize);
         gsap.set([stage, heading, grain], { clearProps: "all" });
