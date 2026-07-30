@@ -166,7 +166,7 @@ export default function ScrollScrubVideoTouch() {
             poster="/videos/how-it-works-poster.jpg"
             {...{ "webkit-playsinline": "true" }}
           >
-            <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
+            <source src="/videos/how-it-works-scrub-portrait.mp4" type="video/mp4" />
           </video>
         </div>
       </section>
@@ -189,7 +189,7 @@ export default function ScrollScrubVideoTouch() {
           poster="/videos/how-it-works-poster.jpg"
           {...{ "webkit-playsinline": "true" }}
         >
-          <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
+          <source src="/videos/how-it-works-scrub-portrait.mp4" type="video/mp4" />
         </video>
       </div>
     </section>
