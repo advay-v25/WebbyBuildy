@@ -508,10 +508,7 @@ export default function LandingExperience() {
       .from("[data-capability-note]", { opacity: 0, y: 30, duration: 0.2 }, 0.62);
 
     const desktopMotion = gsap.matchMedia();
-    // Require a fine pointer so coarse-pointer tablets (iPad, incl. landscape
-    // past 800px) fall through to the touch context below instead of getting
-    // the desktop pin. A real mouse desktop is unaffected.
-    desktopMotion.add("(min-width: 801px) and (hover: hover) and (pointer: fine)", () => {
+    desktopMotion.add("(min-width: 801px)", () => {
       const capabilityLock = ScrollTrigger.create({
         id: "capability-cinematic-lock",
         trigger: "[data-capabilities]",
@@ -527,12 +524,8 @@ export default function LandingExperience() {
       });
       return () => capabilityLock.kill();
     });
-    // Parallel touch context (Phase 4): pin the same section and step through the
-    // four modules on swipe. Shorter pin runway than desktop so it isn't endless.
-    desktopMotion.add("(max-width: 800px), (hover: none) and (pointer: coarse)", () => {
-      // The 2x2 dial stack cannot fit a very short viewport (a phone in
-      // landscape). Rather than crop dials under the pin, skip pinning there and
-      // let the section scroll normally. Portrait phones and tablets still pin.
+
+    desktopMotion.add("(max-width: 800px)", () => {
       if (window.innerHeight < 600) return;
       const capabilityLockTouch = ScrollTrigger.create({
         id: "capability-cinematic-lock-touch",
