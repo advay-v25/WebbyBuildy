@@ -73,10 +73,14 @@ export default function ScrollScrubVideo() {
     return () => stage?.removeEventListener("pointermove", handlePointerMove);
   }, [isTouchDevice, reducedMotion]);
 
-  // Wait for the first decoded frame so the poster never flashes to black
+  // Wait for the first decoded frame so the poster never flashes to black, and force fetch
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    };
 
     const handleLoadedData = () => {
       video.currentTime = 0;
@@ -92,6 +96,7 @@ export default function ScrollScrubVideo() {
       }
     };
 
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("seeked", handleSeeked);
 
     if (video.readyState >= 2) {
@@ -100,16 +105,40 @@ export default function ScrollScrubVideo() {
       video.addEventListener("loadeddata", handleLoadedData);
     }
 
+    video.load();
+
+    const primeDecoder = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => video.pause()).catch(() => {});
+      }
+    };
+
+    primeDecoder();
+
+    const handleFirstTouch = () => {
+      primeDecoder();
+      window.removeEventListener("touchstart", handleFirstTouch);
+    };
+    window.addEventListener("touchstart", handleFirstTouch, { once: true, passive: true });
+
+    const timeoutId = setTimeout(() => {
+      setIsVideoReady(true);
+    }, 3000);
+
     return () => {
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("seeked", handleSeeked);
+      window.removeEventListener("touchstart", handleFirstTouch);
+      clearTimeout(timeoutId);
     };
   }, []);
 
   // Set up ScrollTrigger with cinematic effects
   useGSAP(
     () => {
-      if (!isVideoReady || !videoRef.current) return;
+      if (!videoRef.current) return;
 
       const video = videoRef.current;
       const container = containerRef.current;
@@ -175,7 +204,10 @@ export default function ScrollScrubVideo() {
             const lastFrame = lastFrameRef.current;
             pendingTimeRef.current = frameTime;
 
-            if (currentFrame !== lastFrame && !video.seeking) {
+            // On touch, reduce seek frequency to roughly every 3rd frame to save CPU
+            const isThrottledFrame = isTouchDevice && currentFrame % 3 !== 0;
+
+            if (currentFrame !== lastFrame && !video.seeking && video.readyState >= 1 && !isThrottledFrame) {
               video.currentTime = frameTime;
               lastFrameRef.current = currentFrame;
             }
@@ -277,7 +309,7 @@ export default function ScrollScrubVideo() {
         gsap.set([stage, heading, grain], { clearProps: "all" });
       };
     },
-    { scope: containerRef, dependencies: [isVideoReady, reducedMotion, isTouchDevice] }
+    { scope: containerRef, dependencies: [reducedMotion, isTouchDevice] }
   );
 
   if (reducedMotion) {
