@@ -9,7 +9,7 @@ import Link from "next/link";
 import { CSSProperties, useRef, useState } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
-import { CinematicMotionField } from "@/components/CinematicMotionField";
+
 import { CALENDLY_URL } from "@/lib/constants";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -55,7 +55,7 @@ export function BookExperience() {
       <SiteHeader activeSection="contact" />
       <main id="main-content">
         <section data-book-hero className={styles.bookingScene}>
-          <CinematicMotionField variant="booking" />
+
           <div className={styles.bookingAtmosphere} aria-hidden="true"><i /><i /><i /></div>
 
           <div data-book-copy className={styles.bookingCopy}>

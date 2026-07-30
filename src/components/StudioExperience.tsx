@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
-import { CinematicMotionField } from "@/components/CinematicMotionField";
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -111,7 +111,7 @@ export function StudioExperience() {
       <SiteHeader activeSection="founders" />
       <main id="main-content">
         <section className={`${styles.foundersSection} ${styles.studioPageFounders}`}>
-          <CinematicMotionField variant="studio" />
+
           <div data-studio-copy className={styles.foundersIntro}>
             <p className={styles.mono}>MUMBAI / FOUNDERS</p>
             <h1>Three paths<br /><span>One studio</span></h1>
@@ -145,7 +145,7 @@ export function StudioExperience() {
         </section>
 
         <section id="studio-manifesto" data-manifesto className={styles.studioManifesto}>
-          <CinematicMotionField variant="system" />
+
           <span data-manifesto-signal className={styles.manifestoSignal} aria-hidden="true" />
           <p className={styles.mono}>HOW WE WORK</p>
           <h2>You talk to the people<br />doing the work</h2>
