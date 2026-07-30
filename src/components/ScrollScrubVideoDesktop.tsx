@@ -163,6 +163,10 @@ export default function ScrollScrubVideo() {
           end: "bottom bottom",
           pin: videoPanel,
           scrub: 1,
+          // Page position 3 of three pinned triggers: refresh LAST (lowest
+          // priority) so the hero (3) and capabilities (2) pins insert their
+          // spacers first and this measures start/end against the final layout.
+          refreshPriority: 1,
           onUpdate: (self) => {
             const progress = self.progress;
             // ===== VIDEO SCRUBBING (UNCHANGED) =====

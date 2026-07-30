@@ -12,7 +12,8 @@ import Link from "next/link";
 import { CSSProperties, useCallback, useEffect, useRef, useState, SVGProps } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
-import ScrollScrubVideo from "@/components/ScrollScrubVideo";
+import ScrollScrubVideoDesktop from "@/components/ScrollScrubVideoDesktop";
+import ScrollScrubVideoTouch from "@/components/ScrollScrubVideoTouch";
 import { CinematicMotionField } from "@/components/CinematicMotionField";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -396,6 +397,10 @@ export default function LandingExperience() {
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      // Three pinned triggers on this page must refresh in page order (top to
+      // bottom) so each measures its start/end against earlier pins' spacers.
+      // Higher number = refreshes first: hero 3, capabilities 2, video 1.
+      refreshPriority: 3,
       onUpdate: (self) => {
         if (self.progress > 0.008 && !entranceComplete.current && !entranceTimeline.current?.isActive()) enterSite();
         if (self.progress <= 0.001 && self.direction < 0 && entranceComplete.current) resetEntrance();
@@ -521,6 +526,7 @@ export default function LandingExperience() {
         pinSpacing: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        refreshPriority: 2,
         onUpdate: ({ progress }) => {
           setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
         },
@@ -543,6 +549,7 @@ export default function LandingExperience() {
         pinSpacing: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        refreshPriority: 2,
         onUpdate: ({ progress }) => {
           setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
         },
@@ -889,7 +896,11 @@ export default function LandingExperience() {
         </section>
 
         <section id="how-it-works" className={styles.howItWorksSection}>
-          <ScrollScrubVideo />
+          {/* Touch and desktop use fully separate components so mobile work can
+              never reach the desktop scrub path. isTouch is detected after mount
+              (defaults false), so SSR/first render is the desktop component and
+              a wide desktop never renders the touch one. */}
+          {isTouch ? <ScrollScrubVideoTouch /> : <ScrollScrubVideoDesktop />}
         </section>
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
