@@ -79,16 +79,38 @@ export default function ScrollScrubVideo() {
     const video = videoRef.current;
     if (!video) return;
 
+    // Prime the decoder once real frame data exists, so the first scroll-driven
+    // seek is instant. Guarded so it never runs concurrently or twice, and always
+    // pauses in BOTH the resolve and reject paths so a late-resolving play() can
+    // never fight the currentTime assignments. Marked done only on success, so a
+    // reject (e.g. not enough buffered data yet) can be retried by a later event.
+    let primed = false;
+    let priming = false;
+    const primeDecoder = () => {
+      if (primed || priming || video.readyState < 1) return;
+      const playPromise = video.play();
+      if (playPromise === undefined) {
+        video.pause();
+        primed = true;
+        return;
+      }
+      priming = true;
+      playPromise
+        .then(() => { video.pause(); primed = true; priming = false; })
+        .catch(() => { video.pause(); priming = false; });
+    };
+
     // Video readiness does not change layout, so these handlers must NOT call
-    // ScrollTrigger.refresh(): on mobile they fire late — typically while the
-    // user is already scrolling into the pinned section — and a refresh then
-    // recalculates every trigger's start/end and pin spacing, remapping the
-    // scroll position and desyncing the pin.
-    const handleLoadedMetadata = () => {};
+    // ScrollTrigger.refresh() (it would remap the scroll position mid-scroll and
+    // desync the pin). They only mark readiness and prime the decoder.
+    const handleLoadedMetadata = () => {
+      primeDecoder();
+    };
 
     const handleLoadedData = () => {
       video.currentTime = 0;
       setIsVideoReady(true);
+      primeDecoder();
     };
 
     const handleSeeked = () => {
@@ -108,17 +130,12 @@ export default function ScrollScrubVideo() {
       video.addEventListener("loadeddata", handleLoadedData);
     }
 
+    // Fetch the media, but do NOT prime immediately after — play() right after
+    // load() rejects on mobile (nothing buffered yet). Priming happens from the
+    // readiness handlers above instead.
     video.load();
 
-    const primeDecoder = () => {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => video.pause()).catch(() => {});
-      }
-    };
-
-    primeDecoder();
-
+    // Fallback: the first user touch also primes, and no-ops once primed.
     const handleFirstTouch = () => {
       primeDecoder();
       window.removeEventListener("touchstart", handleFirstTouch);
@@ -221,6 +238,9 @@ export default function ScrollScrubVideo() {
               // freezes the video on a phone decoder.
               pendingTimeRef.current = frameTime;
               lastSeekAtRef.current = now;
+              // Assert paused before seeking so a late-resolving priming play()
+              // can never play the video against the scrub.
+              if (!video.paused) video.pause();
               video.currentTime = frameTime;
               lastFrameRef.current = currentFrame;
             }
