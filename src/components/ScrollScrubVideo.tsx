@@ -277,7 +277,7 @@ export default function ScrollScrubVideo() {
         gsap.set([stage, heading, grain], { clearProps: "all" });
       };
     },
-    { scope: containerRef, dependencies: [isVideoReady, reducedMotion, isTouchDevice] }
+    { scope: containerRef, dependencies: [reducedMotion, isTouchDevice] }
   );
 
   if (reducedMotion) {
