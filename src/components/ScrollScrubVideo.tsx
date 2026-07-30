@@ -175,7 +175,7 @@ export default function ScrollScrubVideo() {
             const lastFrame = lastFrameRef.current;
             pendingTimeRef.current = frameTime;
 
-            if (currentFrame !== lastFrame && !video.seeking) {
+            if (currentFrame !== lastFrame && !video.seeking && video.readyState >= 1) {
               video.currentTime = frameTime;
               lastFrameRef.current = currentFrame;
             }
