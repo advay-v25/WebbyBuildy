@@ -109,7 +109,7 @@ export default function ScrollScrubVideo() {
   // Set up ScrollTrigger with cinematic effects
   useGSAP(
     () => {
-      if (!isVideoReady || !videoRef.current) return;
+      if (!videoRef.current) return;
 
       const video = videoRef.current;
       const container = containerRef.current;
