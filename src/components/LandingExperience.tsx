@@ -12,7 +12,8 @@ import Link from "next/link";
 import { CSSProperties, useCallback, useEffect, useRef, useState, SVGProps } from "react";
 import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
-import ScrollScrubVideo from "@/components/ScrollScrubVideo";
+import ScrollScrubVideoDesktop from "@/components/ScrollScrubVideoDesktop";
+import ScrollScrubVideoTouch from "@/components/ScrollScrubVideoTouch";
 import { CinematicMotionField } from "@/components/CinematicMotionField";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -895,7 +896,11 @@ export default function LandingExperience() {
         </section>
 
         <section id="how-it-works" className={styles.howItWorksSection}>
-          <ScrollScrubVideo />
+          {/* Touch and desktop use fully separate components so mobile work can
+              never reach the desktop scrub path. isTouch is detected after mount
+              (defaults false), so SSR/first render is the desktop component and
+              a wide desktop never renders the touch one. */}
+          {isTouch ? <ScrollScrubVideoTouch /> : <ScrollScrubVideoDesktop />}
         </section>
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
