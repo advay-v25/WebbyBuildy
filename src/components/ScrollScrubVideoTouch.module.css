@@ -31,9 +31,28 @@
   will-change: opacity;
 }
 
+/* Top scrim: guarantees heading contrast over any video frame. Above the video,
+   below the heading. Fades to transparent by ~45% of panel height. */
+.topScrim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.5) 24%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
 .headingOverlay {
   position: absolute;
-  top: clamp(1rem, 4vh, 4rem);
+  /* Clear the sticky toolbar (~68px tall on mobile) with comfortable room. */
+  top: clamp(5.5rem, 13vh, 7rem);
   left: 20px;
   right: 20px;
   z-index: 10;
@@ -52,10 +71,10 @@
 
 .headingOverlay h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  font-size: clamp(2.6rem, 11vw, 3.6rem);
   font-weight: 600;
-  line-height: 0.87;
-  letter-spacing: -0.068em;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
   margin: 0;
   width: 100%;
   color: var(--ivory);
