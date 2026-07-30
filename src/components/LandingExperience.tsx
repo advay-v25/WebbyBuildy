@@ -14,7 +14,6 @@ import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import ScrollScrubVideoDesktop from "@/components/ScrollScrubVideoDesktop";
 import ScrollScrubVideoTouch from "@/components/ScrollScrubVideoTouch";
-import { CinematicMotionField } from "@/components/CinematicMotionField";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -797,7 +796,6 @@ export default function LandingExperience() {
 
         <section id="work" data-cinematic-section className={styles.workSection}>
           <div data-work-wipe className={styles.workTransitionWipe} aria-hidden="true"><i /></div>
-          <CinematicMotionField variant="work" />
           <div data-work-heading className={styles.workHeading}>
             <h2>Work that <span>earns</span> attention</h2>
             <div className={styles.workUtility}>
@@ -904,7 +902,6 @@ export default function LandingExperience() {
         </section>
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
-          <CinematicMotionField variant="studio" />
           <div data-reveal className={styles.foundersIntro}>
             <p className={styles.mono}>FOUNDERS / STUDIO</p>
             <h2>Three paths<br /><span>One studio</span></h2>
@@ -935,7 +932,6 @@ export default function LandingExperience() {
         </section>
 
         <section id="contact" data-cinematic-section className={styles.contactSection}>
-          <CinematicMotionField variant="finale" />
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
           <div data-reveal>
             <h2>Have something<br /><span>worth building</span></h2>
