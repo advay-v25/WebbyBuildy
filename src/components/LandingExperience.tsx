@@ -530,6 +530,10 @@ export default function LandingExperience() {
     // Parallel touch context (Phase 4): pin the same section and step through the
     // four modules on swipe. Shorter pin runway than desktop so it isn't endless.
     desktopMotion.add("(max-width: 800px), (hover: none) and (pointer: coarse)", () => {
+      // The 2x2 dial stack cannot fit a very short viewport (a phone in
+      // landscape). Rather than crop dials under the pin, skip pinning there and
+      // let the section scroll normally. Portrait phones and tablets still pin.
+      if (window.innerHeight < 600) return;
       const capabilityLockTouch = ScrollTrigger.create({
         id: "capability-cinematic-lock-touch",
         trigger: "[data-capabilities]",
