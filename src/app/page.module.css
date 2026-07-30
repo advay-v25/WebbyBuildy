@@ -460,19 +460,21 @@
  .projectPanel,.projectPanel:nth-child(1),.projectPanel:nth-child(2),.projectPanel:nth-child(3),.projectPanel[data-active="true"]{position:relative;top:auto;left:auto;flex:0 0 86vw;width:86vw;height:min(132vw,540px);min-height:0;opacity:1;scroll-snap-align:center;transform-origin:center}
  .projectCopy{width:min(80%,24rem)}
 
- /* Phase 4 — capabilities: pinned and laid out to fit a single viewport */
- .capabilitiesSection{min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:1.3rem;padding-top:6rem;padding-bottom:4rem;overflow:hidden}
- .capabilitiesLeft{gap:1.1rem}
+ /* Phase 4 — capabilities: pin the section but KEEP the liked square 2x2 dial
+    grid, compacted just enough to fit one viewport so no dial crops at its
+    largest active scale during the pin. Only the fit changes, not the 2x2. */
+ .capabilitiesSection{min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:1.2rem;padding-top:6rem;padding-bottom:3.5rem;overflow:hidden}
+ .capabilitiesLeft{gap:1rem}
  .capabilitiesCopy{align-self:auto}
- .capabilitiesCopy h2{font-size:clamp(2.3rem,10vw,3.8rem)}
+ .capabilitiesCopy h2{font-size:clamp(2.3rem,9.5vw,3.6rem)}
  .capabilityNote{display:none}
- .systemStage{min-height:0;margin-top:1.1rem;flex:0 0 auto;justify-content:center}
+ .systemStage{min-height:0;margin-top:1rem;flex:0 0 auto;justify-content:center}
  .systemRail{display:none}
- .systemNodes{grid-template-columns:repeat(4,1fr);gap:.9rem 6px;padding-left:0;align-items:start}
+ .systemNodes{grid-template-columns:1fr 1fr;gap:1.1rem 1rem;padding-left:0;align-items:start;width:min(100%,420px);margin-inline:auto}
  .systemNode{padding:0 2px}
- .optic{width:clamp(54px,16vw,86px)}
- .nodeTitle{margin-top:.9rem;font-size:.62rem;letter-spacing:.02em}
- .capabilityDisplay{margin:1.5rem auto 0;width:min(100%,440px);height:auto;min-height:118px}
+ .optic{width:clamp(60px,19vw,92px)}
+ .nodeTitle{margin-top:.8rem;font-size:.66rem;letter-spacing:.03em}
+ .capabilityDisplay{margin:1.4rem auto 0;width:min(100%,440px);height:auto;min-height:112px}
 
  /* Phase 7 — founder cards: bidirectional carousel (incl. tablet landscape) */
  .foundersSection{display:block}
