@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "lenis/react";
 import { useRef, useEffect, useState } from "react";
-import styles from "@/components/ScrollScrubVideo.module.css";
+import styles from "@/components/ScrollScrubVideoTouch.module.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
