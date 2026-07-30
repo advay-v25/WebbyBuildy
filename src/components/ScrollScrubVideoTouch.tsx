@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "lenis/react";
 import { useRef, useEffect, useState } from "react";
-import styles from "@/components/ScrollScrubVideo.module.css";
+import styles from "@/components/ScrollScrubVideoTouch.module.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,6 +26,7 @@ export default function ScrollScrubVideoTouch() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoPanelRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
   const lastFrameRef = useRef(-1);
   const pendingTimeRef = useRef(0);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -107,6 +108,7 @@ export default function ScrollScrubVideoTouch() {
       const video = videoRef.current;
       const container = containerRef.current;
       const videoPanel = videoPanelRef.current;
+      const heading = headingRef.current;
       if (!video || !container || !videoPanel) return;
 
       const roundToFrame = (seconds: number) =>
@@ -131,6 +133,14 @@ export default function ScrollScrubVideoTouch() {
           // frozen last frame ("Launch").
           const fadeOut = gsap.utils.clamp(0, 1, (progress - 0.95) / 0.05);
           gsap.set(video, { opacity: 1 - fadeOut });
+
+          // Fade the heading out between 35% and 50% of progress so it never sits
+          // over the video's own closing words (which appear centre-frame from
+          // ~53%). Read-only use of progress — the scrub mapping is untouched.
+          if (heading) {
+            const headingOpacity = 1 - gsap.utils.clamp(0, 1, (progress - 0.35) / 0.15);
+            gsap.set(heading, { opacity: headingOpacity });
+          }
 
           const rawTime = Math.min(progress * VIDEO_DURATION, VIDEO_DURATION - FRAME_DURATION);
           const frameTime = roundToFrame(rawTime);
@@ -166,7 +176,7 @@ export default function ScrollScrubVideoTouch() {
             poster="/videos/how-it-works-poster.jpg"
             {...{ "webkit-playsinline": "true" }}
           >
-            <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
+            <source src="/videos/how-it-works-scrub-portrait.mp4" type="video/mp4" />
           </video>
         </div>
       </section>
@@ -176,7 +186,8 @@ export default function ScrollScrubVideoTouch() {
   return (
     <section ref={containerRef} className={styles.track}>
       <div ref={videoPanelRef} className={styles.videoPanel}>
-        <div className={styles.headingOverlay}>
+        <div className={styles.topScrim} aria-hidden="true" />
+        <div ref={headingRef} className={styles.headingOverlay}>
           <p>HOW IT WORKS</p>
           <h2>From <em>first</em> call to <em>live</em> site</h2>
         </div>
@@ -189,7 +200,7 @@ export default function ScrollScrubVideoTouch() {
           poster="/videos/how-it-works-poster.jpg"
           {...{ "webkit-playsinline": "true" }}
         >
-          <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
+          <source src="/videos/how-it-works-scrub-portrait.mp4" type="video/mp4" />
         </video>
       </div>
     </section>

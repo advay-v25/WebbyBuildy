@@ -499,3 +499,10 @@
  .capabilitiesSection{min-height:0;overflow:visible;justify-content:flex-start;padding-top:6rem;padding-bottom:3rem}
  .systemStage{min-height:0}
 }
+
+/* Touch: the scrub video is full-bleed, so remove the section's side gutters
+   (added at max-width:800px above). Touch-only — desktop keeps its spacing and
+   never has this padding anyway. Rendered by ScrollScrubVideoTouch only. */
+@media (hover: none) and (pointer: coarse), (max-width: 800px){
+ .howItWorksSection{padding-left:0;padding-right:0}
+}
