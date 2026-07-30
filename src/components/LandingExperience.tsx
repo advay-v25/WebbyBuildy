@@ -396,6 +396,10 @@ export default function LandingExperience() {
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      // Three pinned triggers on this page must refresh in page order (top to
+      // bottom) so each measures its start/end against earlier pins' spacers.
+      // Higher number = refreshes first: hero 3, capabilities 2, video 1.
+      refreshPriority: 3,
       onUpdate: (self) => {
         if (self.progress > 0.008 && !entranceComplete.current && !entranceTimeline.current?.isActive()) enterSite();
         if (self.progress <= 0.001 && self.direction < 0 && entranceComplete.current) resetEntrance();
@@ -521,6 +525,7 @@ export default function LandingExperience() {
         pinSpacing: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        refreshPriority: 2,
         onUpdate: ({ progress }) => {
           setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
         },
@@ -543,6 +548,7 @@ export default function LandingExperience() {
         pinSpacing: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        refreshPriority: 2,
         onUpdate: ({ progress }) => {
           setActiveCapability(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
         },
