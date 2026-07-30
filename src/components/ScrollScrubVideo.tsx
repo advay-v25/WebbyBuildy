@@ -73,14 +73,46 @@ export default function ScrollScrubVideo() {
     return () => stage?.removeEventListener("pointermove", handlePointerMove);
   }, [isTouchDevice, reducedMotion]);
 
-  // Wait for the first decoded frame so the poster never flashes to black
+  // Wait for the first decoded frame so the poster never flashes to black, and
+  // actively help mobile browsers decode (iOS Safari and Android Chrome under
+  // Data Saver / Low Power largely ignore preload="auto" and never fire
+  // loadeddata until a gesture triggers playback).
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    // Prime the decoder once metadata exists: a muted + playsInline video may
+    // autoplay, so play() then immediately pause() forces the browser to decode
+    // frames that currentTime seeks can land on. Guarded so it runs at most once
+    // (marked done only on success, so a rejected attempt can be retried by the
+    // touch fallback), and pauses in BOTH the resolve and reject paths so a
+    // late-resolving play() can never fight the scrub's currentTime assignments.
+    let primed = false;
+    let priming = false;
+    const primeDecoder = () => {
+      if (primed || priming) return;
+      const playPromise = video.play();
+      if (playPromise === undefined) {
+        video.pause();
+        primed = true;
+        return;
+      }
+      priming = true;
+      playPromise
+        .then(() => { video.pause(); primed = true; priming = false; })
+        .catch(() => { video.pause(); priming = false; });
+    };
+
+    // loadedmetadata only marks readiness and primes — never ScrollTrigger.refresh().
+    const handleLoadedMetadata = () => {
+      setIsVideoReady(true);
+      primeDecoder();
+    };
+
     const handleLoadedData = () => {
       video.currentTime = 0;
       setIsVideoReady(true);
+      primeDecoder();
     };
 
     const handleSeeked = () => {
@@ -91,6 +123,7 @@ export default function ScrollScrubVideo() {
       }
     };
 
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("seeked", handleSeeked);
 
     if (video.readyState >= 2) {
@@ -99,9 +132,26 @@ export default function ScrollScrubVideo() {
       video.addEventListener("loadeddata", handleLoadedData);
     }
 
+    // Prompt mobile browsers to actually fetch. Do NOT prime here — play()
+    // straight after load() rejects because nothing is buffered yet.
+    video.load();
+
+    // First user gesture is the most reliable moment for iOS to allow decode.
+    const handleFirstTouch = () => {
+      primeDecoder();
+      window.removeEventListener("touchstart", handleFirstTouch);
+    };
+    window.addEventListener("touchstart", handleFirstTouch, { once: true, passive: true });
+
+    // Backstop: never let the loading placeholder stick if events stay silent.
+    const readyTimeout = window.setTimeout(() => setIsVideoReady(true), 3000);
+
     return () => {
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("seeked", handleSeeked);
+      window.removeEventListener("touchstart", handleFirstTouch);
+      window.clearTimeout(readyTimeout);
     };
   }, []);
 
