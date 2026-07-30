@@ -211,18 +211,10 @@
   display: block;
 }
 
-/* Mobile styles */
+/* Mobile styles. NOTE: `.track` / `.videoPanel` heights live in the single
+   touch block below (one source of truth, consistent svh units). GSAP owns the
+   pin, so position is not re-declared here. */
 @media (max-width: 800px) {
-  .track {
-    height: 260vh;
-  }
-
-  .videoPanel {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-  }
-
   .headingOverlay {
     top: clamp(1rem, 4vh, 4rem);
     left: 20px;
@@ -259,10 +251,12 @@
   }
 }
 
-/* Touch / small screens: show the WHOLE frame, fit to the viewport.
-   `contain` + black letterboxing means nothing is ever cropped while scrubbing,
-   and svh keeps the pinned panel matched to the visible viewport so mobile
-   browser chrome does not leave a gap after the section. */
+/* Touch / small screens: single source of truth for the pin track and panel.
+   `contain` + black background shows the WHOLE frame (fit-to-screen) while
+   scrubbing. Both heights use the SAME unit family (svh) so the pin track and
+   the pinned panel agree — mixing vh (large viewport) with svh (small viewport)
+   left ~10-15% of a 300vh track uncovered, which rendered as a large empty gap
+   before the next section. */
 @media (hover: none) and (pointer: coarse), (max-width: 800px) {
   .videoElement {
     object-fit: contain;
@@ -272,7 +266,7 @@
     height: 100svh;
   }
   .track {
-    height: 300vh;
+    height: 300svh;
   }
 }
 
