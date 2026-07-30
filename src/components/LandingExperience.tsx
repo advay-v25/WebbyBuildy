@@ -122,15 +122,6 @@ const buildFragments = (rows: readonly FragmentRow[], driftScale: number) =>
 
 const keyboardFragments = buildFragments(fragmentRows, 90);
 
-// Touch / small screens get a far sparser board with tighter horizontal drift so
-// no keycap crosses the viewport edge and the exit reads cleanly at phone width.
-const fragmentRowsTouch: readonly FragmentRow[] = [
-  { top: 38, left: 15, count: 6, gap: 11.8, width: 7.4, height: 12.5 },
-  { top: 52, left: 13, count: 7, gap: 10.9, width: 7.4, height: 12.5 },
-  { top: 66, left: 17, count: 6, gap: 11.4, width: 7.4, height: 12.5 },
-];
-const keyboardFragmentsTouch = buildFragments(fragmentRowsTouch, 24);
-
 export default function LandingExperience() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLElement>(null);
@@ -156,7 +147,6 @@ export default function LandingExperience() {
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
 
   // Touch/small-screen variant of the keyboard scatter (Phase 2).
-  const fragments = isTouch ? keyboardFragmentsTouch : keyboardFragments;
 
   const enterSite = useCallback(() => {
     if (entranceComplete.current || entranceTimeline.current?.isActive()) return;
@@ -342,6 +332,13 @@ export default function LandingExperience() {
   }, [lenis]);
 
   useGSAP(() => {
+    // Compute the touch environment once, synchronously, from matchMedia rather
+    // than the React `isTouch` state. This keeps the guarded desktop-only scroll
+    // animations correct at mount WITHOUT adding `isTouch` to the useGSAP
+    // dependency array — which would tear down and rebuild the entire animation
+    // system (hero pin, entrance timeline, every ScrollTrigger) the instant the
+    // state flips on a touch device, and was the cause of the mobile breakage.
+    const touchEnv = window.matchMedia("(hover: none) and (pointer: coarse)").matches || window.innerWidth <= 800;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       entranceTimeline.current = gsap.timeline({ paused: true, onComplete: () => { entranceComplete.current = true; } })
@@ -449,8 +446,8 @@ export default function LandingExperience() {
         ease: "power2.out",
       }, 1.78)
       .to("[data-keyboard-fragment]", {
-        x: (index) => fragments[index]?.drift ?? 0,
-        y: (index) => window.innerHeight * (1.08 + (fragments[index]?.release ?? 0) * .34),
+        x: (index) => keyboardFragments[index]?.drift ?? 0,
+        y: (index) => window.innerHeight * (1.08 + (keyboardFragments[index]?.release ?? 0) * .34),
         z: (index) => 70 + (index % 9) * 18,
         rotateX: (index) => 38 + (index % 7) * 19,
         rotateY: (index) => ((index % 5) - 2) * 22,
@@ -533,6 +530,10 @@ export default function LandingExperience() {
     // Parallel touch context (Phase 4): pin the same section and step through the
     // four modules on swipe. Shorter pin runway than desktop so it isn't endless.
     desktopMotion.add("(max-width: 800px), (hover: none) and (pointer: coarse)", () => {
+      // The 2x2 dial stack cannot fit a very short viewport (a phone in
+      // landscape). Rather than crop dials under the pin, skip pinning there and
+      // let the section scroll normally. Portrait phones and tablets still pin.
+      if (window.innerHeight < 600) return;
       const capabilityLockTouch = ScrollTrigger.create({
         id: "capability-cinematic-lock-touch",
         trigger: "[data-capabilities]",
@@ -591,7 +592,7 @@ export default function LandingExperience() {
     // capability stage, both of which own their own layout on touch (native
     // carousel / scroll pin). Keep them desktop-only so they don't fight the
     // native scroll or the touch pin. Desktop behaviour is unchanged.
-    if (!isTouch) {
+    if (!touchEnv) {
       gsap.utils.toArray<HTMLElement>("[data-section-stage]").forEach((stage) => {
         gsap.fromTo(stage, { y: 88, scale: .955, rotateX: 7, transformOrigin: "50% 100%" }, {
           y: 0,
@@ -688,7 +689,7 @@ export default function LandingExperience() {
       desktopMotion.revert();
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, { scope: root, dependencies: [isTouch] });
+  }, { scope: root });
 
   return (
     <div ref={root} className={styles.site}>
@@ -753,7 +754,7 @@ export default function LandingExperience() {
               <source src="/hero/keyboard-press-glow.mp4" type="video/mp4" />
             </video>
             <div className={styles.keyboardFragments}>
-              {fragments.map(({ index, column, row, left, top, width, height, backgroundSize, backgroundPosition }) => (
+              {keyboardFragments.map(({ index, column, row, left, top, width, height, backgroundSize, backgroundPosition }) => (
                 <i
                   data-keyboard-fragment
                   key={index}
