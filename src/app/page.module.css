@@ -447,6 +447,11 @@
    Matching JS gates on the same condition: coarse pointer OR viewport <=800px.
    ============================================================================ */
 @media (hover: none) and (pointer: coarse), (max-width: 800px){
+ /* Phase 2 — thin the keyboard scatter to ~1 in 4 pieces (23 of 92) so the hero
+    exit reads cleanly at phone width. The remaining pieces keep the desktop
+    choreography; the hero clips overflow so nothing scrolls horizontally. */
+ .keyboardFragments i:not(:nth-child(4n+1)){display:none}
+
  /* Phase 3 — work deck: centred scroll-snap carousel, full borders both sides */
  .workSection{display:block;padding-top:8rem}
  .projectRail{position:relative;height:auto;min-height:0;display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:2.5rem calc(-1*var(--gutter)) 0;padding:14px 7vw 26px;perspective:none;filter:none}

@@ -41,6 +41,11 @@ export function StudioExperience() {
 
   useGSAP(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Read the touch environment synchronously (not from React `isTouch` state)
+    // so the desktop-only guards below are correct at mount without adding
+    // `isTouch` to the dependency array — that would rebuild the whole GSAP
+    // context when the state flips on touch, which broke the mobile page.
+    const touchEnv = window.matchMedia("(hover: none) and (pointer: coarse)").matches || window.innerWidth <= 800;
 
     gsap.from("[data-studio-copy] > *", {
       opacity: 0,
@@ -67,7 +72,7 @@ export function StudioExperience() {
     // driven transform on it and a scroll-driven active index both fight the
     // swipe (snapping the user forward and blocking the reverse gesture), so
     // keep them desktop-only. Native scroll-snap owns the touch interaction.
-    if (!isTouch) {
+    if (!touchEnv) {
       gsap.fromTo("[data-studio-grid]", { rotateY: 3, xPercent: 2 }, {
         rotateY: -3,
         xPercent: -2,
@@ -99,7 +104,7 @@ export function StudioExperience() {
       ease: "none",
       scrollTrigger: { trigger: "#contact", start: "top 92%", end: "top 34%", scrub: .9 },
     });
-  }, { scope: root, dependencies: [isTouch] });
+  }, { scope: root });
 
   return (
     <div ref={root} className={styles.site}>
