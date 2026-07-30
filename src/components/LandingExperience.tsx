@@ -802,7 +802,7 @@ export default function LandingExperience() {
               </div>
             </div>
           </div>
-          <div data-project-rail ref={projectRail} className={styles.projectRail}>
+          <div data-project-rail ref={projectRail} className={styles.projectRail} {...(isTouch ? { "data-lenis-prevent": "" } : {})}>
             {projects.map((project, index) => (
               <motion.article
                 data-project-panel
@@ -901,7 +901,7 @@ export default function LandingExperience() {
             <p className={styles.founderSmall}>You speak directly to the people designing and building your site No account managers No hand-offs</p>
                 <Link data-magnetic href="/studio/team" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
           </div>
-          <div data-founder-grid data-section-stage className={styles.founderGrid}>
+          <div data-founder-grid data-section-stage className={styles.founderGrid} {...(isTouch ? { "data-lenis-prevent": "" } : {})}>
             <div className={styles.founderPanorama} aria-hidden="true">
               <Image src="/images/studio-founders-panorama.png" alt="" fill sizes="(max-width: 800px) 100vw, 68vw" />
             </div>
