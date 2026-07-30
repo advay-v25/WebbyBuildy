@@ -30,6 +30,7 @@ export default function ScrollScrubVideo() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const lastFrameRef = useRef(-1);
   const pendingTimeRef = useRef(0);
+  const lastSeekAtRef = useRef(0);
   const pointerXRef = useRef(0);
   const pointerYRef = useRef(0);
   const currentRotateXRef = useRef(0);
@@ -204,12 +205,22 @@ export default function ScrollScrubVideo() {
             const frameTime = roundToFrame(rawTime);
             const currentFrame = Math.round(frameTime / FRAME_DURATION);
             const lastFrame = lastFrameRef.current;
-            pendingTimeRef.current = frameTime;
 
-            // On touch, reduce seek frequency to roughly every 3rd frame to save CPU
-            const isThrottledFrame = isTouchDevice && currentFrame % 3 !== 0;
+            // Time-based throttle on touch: at most one seek per ~90ms, always to
+            // the newest target. A modulo-on-frame-index throttle skipped real
+            // positions and made the motion lurch; time-based throttling keeps the
+            // sequence continuous while protecting the decoder.
+            const now = performance.now();
+            const withinThrottle = isTouchDevice && now - lastSeekAtRef.current < 90;
 
-            if (currentFrame !== lastFrame && !video.seeking && video.readyState >= 1 && !isThrottledFrame) {
+            if (currentFrame !== lastFrame && !video.seeking && video.readyState >= 1 && !withinThrottle) {
+              // Record the pending target ONLY for a seek we actually issue. If it
+              // were updated on every scroll tick (including throttled-away frames),
+              // the `seeked` correction handler would chase a frame we never meant
+              // to honour, forcing another seek, then another — a seek storm that
+              // freezes the video on a phone decoder.
+              pendingTimeRef.current = frameTime;
+              lastSeekAtRef.current = now;
               video.currentTime = frameTime;
               lastFrameRef.current = currentFrame;
             }
