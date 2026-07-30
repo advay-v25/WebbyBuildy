@@ -119,7 +119,7 @@ export function StudioExperience() {
             <p className={styles.founderSmall}>Business, aviation, and finance gave us three different ways of thinking Sitesmith is where they meet: precise systems, calm execution, and work built to perform</p>
             <Link href="/studio/team" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
           </div>
-          <div data-studio-grid className={styles.founderGrid}>
+          <div data-studio-grid className={styles.founderGrid} {...(isTouch ? { "data-lenis-prevent": "" } : {})}>
             <div data-studio-panorama className={styles.founderPanorama} aria-hidden="true">
               <Image src="/images/studio-founders-panorama.png" alt="" fill priority sizes="(max-width: 800px) 100vw, 68vw" />
             </div>

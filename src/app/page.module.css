@@ -458,6 +458,12 @@
  .projectRail::-webkit-scrollbar{display:none}
  .projectRail::before,.projectRail::after,.turntableCore{display:none!important}
  .projectPanel,.projectPanel:nth-child(1),.projectPanel:nth-child(2),.projectPanel:nth-child(3),.projectPanel[data-active="true"]{position:relative;top:auto;left:auto;flex:0 0 86vw;width:86vw;height:min(540px,74svh);min-height:0;opacity:1;scroll-snap-align:center;transform-origin:center}
+ /* The panel's own overflow:hidden + border-radius clips its 1px border at
+    subpixel transform positions, so the edges appear to vanish. Draw the hairline
+    as an inset outline instead: it paints over the border box, follows the
+    radius, and is never clipped by the element's overflow. */
+ .projectPanel{outline:1px solid rgba(255,255,255,.26);outline-offset:-1px}
+ .projectPanel[data-active="true"]{outline-color:rgba(255,104,89,.7)}
  .projectCopy{width:min(80%,24rem)}
 
  /* Phase 4 — capabilities: pin the section but KEEP the liked square 2x2 dial
