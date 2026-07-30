@@ -10,7 +10,7 @@ import styles from "@/components/ScrollScrubVideo.module.css";
 gsap.registerPlugin(ScrollTrigger);
 
 const FRAME_DURATION = 1 / 24; // 24fps
-const VIDEO_DURATION = 10; // seconds
+const VIDEO_DURATION = 8.5; // seconds
 
 export default function ScrollScrubVideo() {
   const containerRef = useRef<HTMLDivElement>(null);

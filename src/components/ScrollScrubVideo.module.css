@@ -1,6 +1,6 @@
 .track {
   position: relative;
-  height: 380vh;
+  height: 300vh;
   background: linear-gradient(180deg, #050505, #090808);
 }
 
@@ -267,7 +267,7 @@
     height: 100svh;
   }
   .track {
-    height: 300svh;
+    height: 240svh;
   }
 }
 
