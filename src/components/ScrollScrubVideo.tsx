@@ -27,7 +27,12 @@ export default function ScrollScrubVideo() {
   useLenis(() => ScrollTrigger.update());
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(hover: none) and (pointer: coarse)").matches || window.matchMedia("(max-width: 800px)").matches;
+    }
+    return false;
+  });
   const lastFrameRef = useRef(-1);
   const pendingTimeRef = useRef(0);
   const pointerXRef = useRef(0);
@@ -44,14 +49,7 @@ export default function ScrollScrubVideo() {
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
-  // Detect touch device
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      setIsTouchDevice(
-        window.matchMedia("(hover: none) and (pointer: coarse)").matches
-      );
-    });
-  }, []);
+
 
   // Cursor parallax (desktop only)
   useEffect(() => {
@@ -78,10 +76,6 @@ export default function ScrollScrubVideo() {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleLoadedMetadata = () => {
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-    };
-
     const handleLoadedData = () => {
       video.currentTime = 0;
       setIsVideoReady(true);
@@ -96,7 +90,6 @@ export default function ScrollScrubVideo() {
       }
     };
 
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("seeked", handleSeeked);
 
     if (video.readyState >= 2) {
@@ -127,7 +120,6 @@ export default function ScrollScrubVideo() {
     }, 3000);
 
     return () => {
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("seeked", handleSeeked);
       window.removeEventListener("touchstart", handleFirstTouch);
@@ -212,8 +204,8 @@ export default function ScrollScrubVideo() {
               lastFrameRef.current = currentFrame;
             }
 
-            // ===== CINEMATIC EFFECTS (if not reduced motion) =====
-            if (!reducedMotion) {
+            // ===== CINEMATIC EFFECTS (if not reduced motion and not touch) =====
+            if (!reducedMotion && !isTouchDevice) {
               const entry = Math.min(progress / .14, 1);
               const exit = Math.max((progress - .86) / .14, 0);
               const dollyProgress = .84 + entry * .16 - exit * .08;
@@ -322,11 +314,12 @@ export default function ScrollScrubVideo() {
             muted
             playsInline
             preload="auto"
-            poster="/videos/how-it-works-poster.jpg"
+            poster={isTouchDevice ? "/videos/how-it-works-poster.jpg" : "/videos/how-it-works-poster.jpg"}
             controls
+            suppressHydrationWarning
             {...{ "webkit-playsinline": "true" }}
           >
-            <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
+            <source src={isTouchDevice ? "/videos/how-it-works-scrub-portrait.mp4" : "/videos/how-it-works-scrub.mp4"} type="video/mp4" />
           </video>
         </div>
       </section>
@@ -348,13 +341,14 @@ export default function ScrollScrubVideo() {
             muted
             playsInline
             preload="auto"
-            poster="/videos/how-it-works-poster.jpg"
+            poster={isTouchDevice ? "/videos/how-it-works-poster.jpg" : "/videos/how-it-works-poster.jpg"}
+            suppressHydrationWarning
             {...{ "webkit-playsinline": "true" }}
           >
-            <source src="/videos/how-it-works-scrub.mp4" type="video/mp4" />
+            <source src={isTouchDevice ? "/videos/how-it-works-scrub-portrait.mp4" : "/videos/how-it-works-scrub.mp4"} type="video/mp4" />
           </video>
 
-          {!isVideoReady && <div className={styles.loadingPlaceholder} />}
+          {!isVideoReady && !isTouchDevice && <div className={styles.loadingPlaceholder} />}
 
           {/* Vignette overlay */}
           <div ref={vignetteRef} className={styles.vignette} />
