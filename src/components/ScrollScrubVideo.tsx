@@ -81,7 +81,6 @@ export default function ScrollScrubVideo() {
     const handleLoadedData = () => {
       video.currentTime = 0;
       setIsVideoReady(true);
-      requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
     const handleSeeked = () => {
@@ -253,7 +252,11 @@ export default function ScrollScrubVideo() {
       // svh). Without this the pin spacer can be sized against stale dimensions,
       // which shows up as an empty gap after the section (Phase 6).
       requestAnimationFrame(() => ScrollTrigger.refresh());
-      const handleResize = () => ScrollTrigger.refresh();
+      let resizeTimer: number | undefined;
+      const handleResize = () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+      };
       window.addEventListener("resize", handleResize);
       window.addEventListener("orientationchange", handleResize);
 
@@ -272,6 +275,7 @@ export default function ScrollScrubVideo() {
       return () => {
         tl.kill();
         if (rafId) cancelAnimationFrame(rafId);
+        window.clearTimeout(resizeTimer);
         window.removeEventListener("resize", handleResize);
         window.removeEventListener("orientationchange", handleResize);
         gsap.set([stage, heading, grain], { clearProps: "all" });
