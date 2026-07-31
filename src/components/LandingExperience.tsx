@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import { animate } from "animejs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Compass } from "lucide-react";
+import { ArrowDown, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Compass } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "lenis/react";
@@ -636,26 +636,7 @@ export default function LandingExperience() {
     });
 
     const cleanups: Array<() => void> = [];
-    let chapterExitInFlight = false;
-    const handleChapterExit = (event: WheelEvent) => {
-      if (event.deltaY <= 0 || chapterExitInFlight || !entranceComplete.current) return;
 
-      const heroBounds = hero.current?.getBoundingClientRect();
-      const workSection = document.querySelector<HTMLElement>("#work");
-      if (!heroBounds || !workSection || heroBounds.bottom <= 0 || heroBounds.top > 1) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      chapterExitInFlight = true;
-      lenis?.scrollTo(workSection, {
-        duration: .68,
-        lock: true,
-        force: true,
-        onComplete: () => { chapterExitInFlight = false; },
-      });
-    };
-    window.addEventListener("wheel", handleChapterExit, { passive: false, capture: true });
-    cleanups.push(() => window.removeEventListener("wheel", handleChapterExit, { capture: true }));
 
     gsap.utils.toArray<HTMLElement>("[data-magnetic]").forEach((element) => {
       const xTo = gsap.quickTo(element, "--magnet-x", { duration: 0.35, ease: "power3.out" });
@@ -789,7 +770,10 @@ export default function LandingExperience() {
             <div data-curtain-line className={styles.curtainLine} />
             <div data-curtain-copy>
               <strong>Built to be used<br /><em>Designed to be felt</em></strong>
-              <p>Strategy, design, development and motion, without the agency drag</p>
+              <p>Direction, designing, refining and delivery, all without the agency drag.</p>
+            </div>
+            <div className={styles.scrollDownIndicator}>
+              <p>scroll down to see our previous work <ArrowDown size={15} style={{ display: "inline-flex", verticalAlign: "middle" }} /></p>
             </div>
           </div>
         </section>
@@ -839,7 +823,21 @@ export default function LandingExperience() {
                   <p>{project.copy}</p>
                 </div>
                 {project.live && activeProject === index ? (
-                  <a className={styles.projectVisit} href={project.link} target="_blank" rel="noreferrer" aria-label={`Visit ${project.title}`}><ArrowUpRight /></a>
+                  <a 
+                    className={styles.projectVisit} 
+                    href={project.link} 
+                    target={project.link === "#" ? undefined : "_blank"} 
+                    rel="noreferrer" 
+                    aria-label={`Visit ${project.title}`}
+                    onClick={(e) => {
+                      if (project.link === "#") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    }}
+                  >
+                    <ArrowUpRight />
+                  </a>
                 ) : <ArrowDownRight className={styles.projectArrow} aria-hidden="true" />}
               </motion.article>
             ))}
@@ -903,11 +901,11 @@ export default function LandingExperience() {
 
         <section id="founders" data-cinematic-section className={styles.foundersSection}>
           <div data-reveal className={styles.foundersIntro}>
-            <p className={styles.mono}>FOUNDERS / STUDIO</p>
+            <p className={styles.mono}>THE STUDIO</p>
             <h2>Three paths<br /><span>One studio</span></h2>
             <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now</p>
-            <p className={styles.founderSmall}>You speak directly to the people designing and building your site No account managers No hand-offs</p>
-                <Link data-magnetic href="/studio/team" className={styles.founderButton}>Meet the studio <ArrowUpRight size={18} /></Link>
+            <p className={styles.founderSmall}>You speak directly to the people designing and building your site. No account managers, no hand-offs.</p>
+                <Link data-magnetic href="/studio/team" className={styles.founderButton}>Meet the founders <ArrowUpRight size={18} /></Link>
           </div>
           <div data-founder-grid data-section-stage className={styles.founderGrid} {...(isTouch ? { "data-lenis-prevent": "" } : {})}>
             <div className={styles.founderPanorama} aria-hidden="true">
