@@ -123,7 +123,7 @@ export default function TeamPage() {
             </Link>
           </motion.div>
           <motion.p className={styles.eyebrow} variants={rise}>
-            FOUNDERS / TEAM
+            FOUNDERS
           </motion.p>
           <motion.h1 variants={rise}>
             The people<br />behind the <span>pixels</span>

@@ -34,7 +34,7 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
       <nav id="site-navigation" className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`} aria-label="Main navigation">
         <Link data-active={activeSection === "work"} href="/#work" onClick={closeMenu}>Work</Link>
         <Link data-active={activeSection === "process"} href="/#process" onClick={closeMenu}>Process</Link>
-        <Link data-active={activeSection === "founders"} href="/studio" onClick={closeMenu}>Studio</Link>
+        <Link data-active={activeSection === "founders"} href="/#founders" onClick={closeMenu}>Studio</Link>
         <Link data-magnetic href="/book" className={styles.navCta} onClick={closeMenu}>
           Start a project <ArrowUpRight size={15} />
         </Link>
