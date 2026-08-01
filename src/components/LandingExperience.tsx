@@ -340,14 +340,10 @@ export default function LandingExperience() {
     // state flips on a touch device, and was the cause of the mobile breakage.
     const touchEnv = window.matchMedia("(hover: none) and (pointer: coarse)").matches || window.innerWidth <= 800;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      entranceTimeline.current = gsap.timeline({ paused: true, onComplete: () => { entranceComplete.current = true; } })
-        .set("[data-hero-copy-wrap],[data-space-prompt]", { opacity: 0 })
-        .set("[data-keyboard-fallback]", { opacity: 0 })
-        .set("[data-story-curtain]", { yPercent: 0, opacity: 1 })
-        .set("[data-curtain-copy]", { opacity: 1, y: 0 });
-      return;
-    }
+    const skipEntrance = sessionStorage.getItem("skipEntrance") === "true";
+    if (skipEntrance) sessionStorage.removeItem("skipEntrance");
+
+
 
     const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
     openingTimeline.current = intro;
@@ -471,6 +467,13 @@ export default function LandingExperience() {
       .fromTo("[data-curtain-line]", { scaleX: 0 }, { scaleX: 1, duration: .88, ease: "power3.out" }, 3.52)
       .fromTo("[data-curtain-copy]", { opacity: 0, y: 30, z: -90, rotateX: 5 }, { opacity: 1, y: 0, z: 0, rotateX: 0, duration: .92, ease: "power3.out" }, 3.66)
       .to(hero.current, { "--hero-shade-opacity": 0, duration: .82, ease: "power1.out" }, 3.18);
+
+    if (reduced || skipEntrance) {
+      entranceComplete.current = true;
+      introSettled.current = true;
+      if (openingTimeline.current) openingTimeline.current.progress(1).pause();
+      if (entranceTimeline.current) entranceTimeline.current.progress(1).pause();
+    }
 
     ([
       ["#top", "top"],

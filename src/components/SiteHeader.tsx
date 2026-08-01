@@ -32,9 +32,21 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
         <span />
       </button>
       <nav id="site-navigation" className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`} aria-label="Main navigation">
-        <Link data-active={activeSection === "work"} href="/#work" onClick={closeMenu}>Work</Link>
-        <Link data-active={activeSection === "process"} href="/#process" onClick={closeMenu}>Process</Link>
-        <Link data-active={activeSection === "founders"} href="/#founders" onClick={closeMenu}>Studio</Link>
+        {activeSection === "contact" || activeSection === "founders" ? (
+          <a data-active={activeSection === "work"} href="/#work" onClick={() => { sessionStorage.setItem("skipEntrance", "true"); closeMenu(); }}>Work</a>
+        ) : (
+          <Link data-active={activeSection === "work"} href="/#work" onClick={closeMenu}>Work</Link>
+        )}
+        {activeSection === "contact" || activeSection === "founders" ? (
+          <a data-active={activeSection === "process"} href="/#process" onClick={() => { sessionStorage.setItem("skipEntrance", "true"); closeMenu(); }}>Process</a>
+        ) : (
+          <Link data-active={activeSection === "process"} href="/#process" onClick={closeMenu}>Process</Link>
+        )}
+        {activeSection === "contact" || activeSection === "founders" ? (
+          <a data-active={activeSection === "founders"} href="/#founders" onClick={() => { sessionStorage.setItem("skipEntrance", "true"); closeMenu(); }}>Studio</a>
+        ) : (
+          <Link data-active={activeSection === "founders"} href="/#founders" onClick={closeMenu}>Studio</Link>
+        )}
         <Link data-magnetic href="/book" className={styles.navCta} onClick={closeMenu}>
           Start a project <ArrowUpRight size={15} />
         </Link>
