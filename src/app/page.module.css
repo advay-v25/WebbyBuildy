@@ -480,6 +480,14 @@
  .studioPageFounders .founderPanel,.studioPageFounders .founderPanel[data-active="true"]{min-height:min(520px,78svh)!important}
 }
 
+/* Tablets and large touch screens only: phones stay at 78vw (<=800px),
+   desktop is untouched (it has a fine pointer). Caps the card width so the
+   panels keep phone-like proportions instead of stretching across the screen. */
+@media (hover: none) and (pointer: coarse) and (min-width: 801px) {
+ .founderPanel,
+ .founderPanel[data-active="true"]{flex:0 0 clamp(300px,38vw,400px)}
+}
+
 /* Short viewports (a phone in landscape): the capability pin is skipped in JS,
    so let the section scroll normally instead of clamping to 100svh and clipping
    the dials. Scoped to the same touch audiences; desktop never matches. */
