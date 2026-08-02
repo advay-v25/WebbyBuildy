@@ -123,7 +123,7 @@ export default function ScrollScrubVideoTouch() {
         start: "top top",
         end: "bottom bottom",
         pin: videoPanel,
-        scrub: 1,
+        scrub: 0.4,
         // Page position 3 of three pinned triggers — refresh last.
         refreshPriority: 1,
         onUpdate: (self) => {

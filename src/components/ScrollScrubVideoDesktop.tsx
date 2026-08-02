@@ -162,7 +162,7 @@ export default function ScrollScrubVideo() {
           start: "top top",
           end: "bottom bottom",
           pin: videoPanel,
-          scrub: 1,
+          scrub: 0.4,
           // Page position 3 of three pinned triggers: refresh LAST (lowest
           // priority) so the hero (3) and capabilities (2) pins insert their
           // spacers first and this measures start/end against the final layout.
