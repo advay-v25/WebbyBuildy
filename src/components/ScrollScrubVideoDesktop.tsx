@@ -30,6 +30,9 @@ export default function ScrollScrubVideo() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const lastFrameRef = useRef(-1);
   const pendingTimeRef = useRef(0);
+  const targetTimeRef = useRef(0);
+  const displayTimeRef = useRef(0);
+  const settleRafRef = useRef<number | null>(null);
   const pointerXRef = useRef(0);
   const pointerYRef = useRef(0);
   const currentRotateXRef = useRef(0);
@@ -80,6 +83,7 @@ export default function ScrollScrubVideo() {
 
     const handleLoadedData = () => {
       video.currentTime = 0;
+      displayTimeRef.current = 0;
       setIsVideoReady(true);
       requestAnimationFrame(() => ScrollTrigger.refresh());
     };
@@ -128,6 +132,36 @@ export default function ScrollScrubVideo() {
         return Math.round(seconds / FRAME_DURATION) * FRAME_DURATION;
       };
 
+      // Damped follower: eases the displayed time toward the scroll-driven
+      // target so stopping scroll settles smoothly onto the final frame
+      // instead of freezing wherever progress happened to land.
+      const tick = () => {
+        const video = videoRef.current;
+        if (!video) {
+          settleRafRef.current = null;
+          return;
+        }
+
+        const target = targetTimeRef.current;
+        const diff = target - displayTimeRef.current;
+
+        if (Math.abs(diff) < FRAME_DURATION * 0.5) {
+          displayTimeRef.current = target;
+          settleRafRef.current = null;
+        } else {
+          displayTimeRef.current += diff * 0.25;
+          settleRafRef.current = requestAnimationFrame(tick);
+        }
+
+        const frameTime = roundToFrame(displayTimeRef.current);
+        const currentFrame = Math.round(frameTime / FRAME_DURATION);
+        if (currentFrame !== lastFrameRef.current && !video.seeking) {
+          pendingTimeRef.current = frameTime;
+          video.currentTime = frameTime;
+          lastFrameRef.current = currentFrame;
+        }
+      };
+
       // Kill any existing trigger
       ScrollTrigger.getAll().forEach((trigger) => {
         if (trigger.vars.trigger === container) {
@@ -174,14 +208,9 @@ export default function ScrollScrubVideo() {
             gsap.set(video, { opacity: fadeInProgress });
 
             const rawTime = Math.min(progress * VIDEO_DURATION, VIDEO_DURATION - FRAME_DURATION);
-            const frameTime = roundToFrame(rawTime);
-            const currentFrame = Math.round(frameTime / FRAME_DURATION);
-            const lastFrame = lastFrameRef.current;
-            pendingTimeRef.current = frameTime;
-
-            if (currentFrame !== lastFrame && !video.seeking) {
-              video.currentTime = frameTime;
-              lastFrameRef.current = currentFrame;
+            targetTimeRef.current = rawTime;
+            if (settleRafRef.current === null) {
+              settleRafRef.current = requestAnimationFrame(tick);
             }
 
             // ===== CINEMATIC EFFECTS (if not reduced motion) =====
@@ -276,6 +305,7 @@ export default function ScrollScrubVideo() {
       return () => {
         tl.kill();
         if (rafId) cancelAnimationFrame(rafId);
+        if (settleRafRef.current !== null) cancelAnimationFrame(settleRafRef.current);
         window.removeEventListener("resize", handleResize);
         window.removeEventListener("orientationchange", handleResize);
         gsap.set([stage, heading, grain], { clearProps: "all" });

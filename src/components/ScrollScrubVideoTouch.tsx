@@ -29,6 +29,9 @@ export default function ScrollScrubVideoTouch() {
   const headingRef = useRef<HTMLDivElement>(null);
   const lastFrameRef = useRef(-1);
   const pendingTimeRef = useRef(0);
+  const targetTimeRef = useRef(0);
+  const displayTimeRef = useRef(0);
+  const settleRafRef = useRef<number | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useLenis(() => ScrollTrigger.update());
@@ -114,6 +117,36 @@ export default function ScrollScrubVideoTouch() {
       const roundToFrame = (seconds: number) =>
         Math.round(seconds / FRAME_DURATION) * FRAME_DURATION;
 
+      // Damped follower: eases the displayed time toward the scroll-driven
+      // target so stopping scroll settles smoothly onto the final frame
+      // instead of freezing wherever progress happened to land.
+      const tick = () => {
+        const video = videoRef.current;
+        if (!video) {
+          settleRafRef.current = null;
+          return;
+        }
+
+        const target = targetTimeRef.current;
+        const diff = target - displayTimeRef.current;
+
+        if (Math.abs(diff) < FRAME_DURATION * 0.5) {
+          displayTimeRef.current = target;
+          settleRafRef.current = null;
+        } else {
+          displayTimeRef.current += diff * 0.25;
+          settleRafRef.current = requestAnimationFrame(tick);
+        }
+
+        const frameTime = roundToFrame(displayTimeRef.current);
+        const currentFrame = Math.round(frameTime / FRAME_DURATION);
+        if (currentFrame !== lastFrameRef.current && !video.seeking && video.readyState >= 1) {
+          pendingTimeRef.current = frameTime;
+          video.currentTime = frameTime;
+          lastFrameRef.current = currentFrame;
+        }
+      };
+
       gsap.set(video, { opacity: 1 });
 
       // Created unconditionally on mount (never gated on readiness) so the pin
@@ -143,20 +176,17 @@ export default function ScrollScrubVideoTouch() {
           }
 
           const rawTime = Math.min(progress * VIDEO_DURATION, VIDEO_DURATION - FRAME_DURATION);
-          const frameTime = roundToFrame(rawTime);
-          const currentFrame = Math.round(frameTime / FRAME_DURATION);
-
-          if (currentFrame !== lastFrameRef.current && !video.seeking && video.readyState >= 1) {
-            // Record the target ONLY for a seek we actually issue, so the seeked
-            // correction handler can never trigger a seek storm.
-            pendingTimeRef.current = frameTime;
-            video.currentTime = frameTime;
-            lastFrameRef.current = currentFrame;
+          targetTimeRef.current = rawTime;
+          if (settleRafRef.current === null) {
+            settleRafRef.current = requestAnimationFrame(tick);
           }
         },
       });
 
-      return () => trigger.kill();
+      return () => {
+        trigger.kill();
+        if (settleRafRef.current !== null) cancelAnimationFrame(settleRafRef.current);
+      };
     },
     { scope: containerRef, dependencies: [reducedMotion] }
   );
