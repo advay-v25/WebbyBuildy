@@ -9,7 +9,7 @@ import styles from "@/components/ScrollScrubVideoTouch.module.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const FRAME_DURATION = 1 / 24; // 24fps
+const FRAME_DURATION = 1 / 48; // 48fps
 const VIDEO_DURATION = 10; // seconds
 
 /**
