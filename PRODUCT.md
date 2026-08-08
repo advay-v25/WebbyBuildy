@@ -1,6 +1,6 @@
-# WebbyBuildy Product Context
+# Sitesmith Product Context
 
-## What is WebbyBuildy?
+## What is Sitesmith?
 A premium mechanical keyboard and UI/UX design showcase platform built with Next.js, showcasing high-end keyboards with immersive 3D/video interactions.
 
 ## Target Audience

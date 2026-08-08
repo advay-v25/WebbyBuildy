@@ -1,4 +1,4 @@
-# WebbyBuildy cinematic design system
+# Sitesmith cinematic design system
 
 **Direction:** restrained cinematic editorial studio
 **Updated:** 2026-07-21

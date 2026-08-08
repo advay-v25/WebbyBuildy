@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://sitesmith.co.in"),
   title: "Sitesmith | Web Design Studio, Mumbai",
   description: "Most websites take months and cost lakhs. Yours will take days. Custom-designed websites for your brand or business, built by three people you'll actually talk to.",
+  alternates: {
+    canonical: "https://sitesmith.co.in",
+  },
   openGraph: {
     type: "website",
     siteName: "Sitesmith",
@@ -40,6 +43,25 @@ export default function RootLayout({
         {/* Analytics stub: GA4 snippet placeholder */}
         {/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
         <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-XXXXXXXXXX');` }} /> */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            name: "Sitesmith",
+            url: "https://sitesmith.co.in",
+            description: "Web design studio in Mumbai building custom websites for professionals and businesses.",
+            email: "studio@sitesmith.co.in",
+            telephone: "+91-98202-36834",
+            address: { "@type": "PostalAddress", addressLocality: "Mumbai", addressRegion: "Maharashtra", addressCountry: "IN" },
+            areaServed: "IN",
+            founder: [
+              { "@type": "Person", name: "Aarav Aher" },
+              { "@type": "Person", name: "Abhimanyu Gupta" },
+              { "@type": "Person", name: "Advay Vaidya" },
+            ],
+          })}}
+        />
       </head>
       <body suppressHydrationWarning>
         <LenisProvider>

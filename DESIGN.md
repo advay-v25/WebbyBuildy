@@ -1,4 +1,4 @@
-# WebbyBuildy Design System
+# Sitesmith Design System
 
 ## Color Palette
 

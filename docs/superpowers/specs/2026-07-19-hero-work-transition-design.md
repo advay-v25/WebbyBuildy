@@ -1,7 +1,7 @@
 # Hero → Work Transition Fix — Design
 
 **Status:** Approved for implementation
-**Scope:** Phase 1 of the WebbyBuildy cinematic redesign (home page only). Phases 2/3 (Book/Studio content + new interactive elements) are out of scope for this spec and will get their own design pass later.
+**Scope:** Phase 1 of the Sitesmith cinematic redesign (home page only). Phases 2/3 (Book/Studio content + new interactive elements) are out of scope for this spec and will get their own design pass later.
 
 ## Context
 
