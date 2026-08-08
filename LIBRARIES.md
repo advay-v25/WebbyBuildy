@@ -1,4 +1,4 @@
-# WebbyBuildy Library & Skill Integration
+# Sitesmith Library & Skill Integration
 
 All reference repositories have been cloned to `.references/` and documented in Claude Code memory for future sessions.
 
@@ -126,7 +126,7 @@ export function RootLayout({ children }) {
 ## Memory & Future Sessions
 
 All information is saved in Claude Code memory at:
-- `.claude/projects/-Users-AaravAher-Webby-WebbyBuildy/memory/`
+- `.claude/projects/-Users-AaravAher-Webby-Sitesmith/memory/`
 
 Future Claude Code sessions will have full context about:
 - Which libraries to use when
