@@ -826,11 +826,11 @@ export default function LandingExperience() {
                   <p>{project.copy}</p>
                 </div>
                 {project.live && activeProject === index ? (
-                  <a 
-                    className={styles.projectVisit} 
-                    href={project.link} 
-                    target={project.link === "#" ? undefined : "_blank"} 
-                    rel="noreferrer" 
+                  <a
+                    className={styles.projectVisit}
+                    href={project.link}
+                    target={project.link === "#" ? undefined : "_blank"}
+                    rel="noreferrer"
                     aria-label={`Visit ${project.title}`}
                     onClick={(e) => {
                       if (project.link === "#") {
@@ -858,27 +858,27 @@ export default function LandingExperience() {
           <div data-section-stage className={styles.systemStage}>
             <div className={styles.systemRail} aria-hidden="true"><i /></div>
             <div className={styles.systemNodes}>
-            {capabilities.map(([number, title, copy, Icon], index) => (
-              <motion.button
-                data-system-node
-                data-active={activeCapability === index || hoveredCapability === index}
-                aria-label={`${title}: ${copy}`}
-                onClick={() => setActiveCapability(index)}
-                onMouseEnter={() => setHoveredCapability(index)}
-                onMouseLeave={() => setHoveredCapability(null)}
-                onFocus={() => setHoveredCapability(index)}
-                onBlur={() => setHoveredCapability(null)}
-                key={number}
-                className={styles.systemNode}
-                animate={activeCapability === index || hoveredCapability === index ? { y: -12, scale: 1.07, rotateX: -6, rotateY: index % 2 ? 5 : -5, opacity: 1 } : { y: 5, scale: .91, rotateX: 0, rotateY: 0, opacity: .62 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 190, damping: 22 }}
-              >
-                <span className={styles.nodeIndex}>{number}</span>
-                <span className={styles.optic}><Icon aria-hidden="true" /><i /><b /></span>
-                <span className={styles.nodeTitle}>{title}</span>
-              </motion.button>
-            ))}
+              {capabilities.map(([number, title, copy, Icon], index) => (
+                <motion.button
+                  data-system-node
+                  data-active={activeCapability === index || hoveredCapability === index}
+                  aria-label={`${title}: ${copy}`}
+                  onClick={() => setActiveCapability(index)}
+                  onMouseEnter={() => setHoveredCapability(index)}
+                  onMouseLeave={() => setHoveredCapability(null)}
+                  onFocus={() => setHoveredCapability(index)}
+                  onBlur={() => setHoveredCapability(null)}
+                  key={number}
+                  className={styles.systemNode}
+                  animate={activeCapability === index || hoveredCapability === index ? { y: -12, scale: 1.07, rotateX: -6, rotateY: index % 2 ? 5 : -5, opacity: 1 } : { y: 5, scale: .91, rotateX: 0, rotateY: 0, opacity: .62 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 190, damping: 22 }}
+                >
+                  <span className={styles.nodeIndex}>{number}</span>
+                  <span className={styles.optic}><Icon aria-hidden="true" /><i /><b /></span>
+                  <span className={styles.nodeTitle}>{title}</span>
+                </motion.button>
+              ))}
             </div>
             <AnimatePresence mode="wait">
               <motion.aside key={activeCapability} className={styles.capabilityDisplay} initial={{ opacity: 0, y: 18, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -12, filter: "blur(6px)" }} transition={{ duration: 0.34 }}>
@@ -908,7 +908,7 @@ export default function LandingExperience() {
             <h2>Three paths<br /><span>One studio</span></h2>
             <p className={styles.founderLead}>Three friends from Mumbai, building with the tools agencies will be using five years from now</p>
             <p className={styles.founderSmall}>You speak directly to the people designing and building your site. No account managers, no hand-offs.</p>
-                <Link data-magnetic href="/studio/team" className={styles.founderButton}>Meet the founders <ArrowUpRight size={18} /></Link>
+            <Link data-magnetic href="/studio/team" className={styles.founderButton}>Meet the founders <ArrowUpRight size={18} /></Link>
           </div>
           <div data-founder-grid data-section-stage className={styles.founderGrid} {...(isTouch ? { "data-lenis-prevent": "" } : {})}>
             <div className={styles.founderPanorama} aria-hidden="true">
