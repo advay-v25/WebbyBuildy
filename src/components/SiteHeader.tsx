@@ -6,11 +6,13 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import styles from "@/app/page.module.css";
+import { RegisterInterestModal } from "./RegisterInterestModal";
 
 type Section = "top" | "work" | "process" | "founders" | "contact";
 
 export function SiteHeader({ activeSection = "top" }: { activeSection?: Section }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -48,10 +50,18 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
         ) : (
           <Link data-active={false} href="/#founders" onClick={closeMenu}>Studio</Link>
         )}
-        <Link data-magnetic href="/book" className={styles.navCta} onClick={closeMenu}>
-          Start a project <ArrowUpRight size={15} />
-        </Link>
+        <button 
+          data-magnetic 
+          className={styles.navCta} 
+          onClick={() => {
+            setModalOpen(true);
+            closeMenu();
+          }}
+        >
+          Register your interest <ArrowUpRight size={15} />
+        </button>
       </nav>
+      <RegisterInterestModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </header>
   );
 }

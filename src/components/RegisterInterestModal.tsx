@@ -1,0 +1,51 @@
+import { useState } from "react";
+import { useForm, ValidationError } from "@formspree/react";
+import styles from "./RegisterInterestModal.module.css";
+import { X } from "lucide-react";
+
+export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [state, handleSubmit] = useForm("mvgzzpzo");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
+          <X size={24} />
+        </button>
+        <h2>Register Your Interest</h2>
+        {state.succeeded ? (
+          <div className={styles.successMessage}>
+            <p>Thanks for registering! We'll get in touch with you shortly.</p>
+            <button onClick={onClose} className={styles.submitButton}>Close</button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="name">Name</label>
+              <input id="name" type="text" name="name" required placeholder="John Doe" />
+              <ValidationError prefix="Name" field="name" errors={state.errors} />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="email">Email Address</label>
+              <input id="email" type="email" name="email" required placeholder="john@example.com" />
+              <ValidationError prefix="Email" field="email" errors={state.errors} />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="message">Tell us about your project</label>
+              <textarea id="message" name="message" required placeholder="I am looking to build..." rows={4} />
+              <ValidationError prefix="Message" field="message" errors={state.errors} />
+            </div>
+
+            <button type="submit" className={styles.submitButton} disabled={state.submitting}>
+              {state.submitting ? "Submitting..." : "Submit"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
