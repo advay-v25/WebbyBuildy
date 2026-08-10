@@ -4,7 +4,7 @@ import styles from "./RegisterInterestModal.module.css";
 import { X } from "lucide-react";
 
 export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [state, handleSubmit] = useForm("mvgzzpzo");
+  const [state, handleSubmit] = useForm("mqpzpnzw");
 
   if (!isOpen) return null;
 
@@ -14,7 +14,12 @@ export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; on
         <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
           <X size={24} />
         </button>
-        <h2>Register Your Interest</h2>
+        <div style={{ textAlign: "center" }}>
+          <h2>Register Your Interest</h2>
+          <p style={{ fontSize: "0.875rem", color: "#aaa", marginTop: "8px", lineHeight: 1.4, margin: "8px 0 0" }}>
+            If you have a query or would like to discuss a project, we'd be happy to get in touch.
+          </p>
+        </div>
         {state.succeeded ? (
           <div className={styles.successMessage}>
             <p>Thanks for registering! We'll get in touch with you shortly.</p>
@@ -35,9 +40,9 @@ export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; on
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="message">Tell us about your project</label>
-              <textarea id="message" name="message" required placeholder="I am looking to build..." rows={4} />
-              <ValidationError prefix="Message" field="message" errors={state.errors} />
+              <label htmlFor="query">Query</label>
+              <textarea id="query" name="query" required placeholder="I am looking to build..." rows={4} />
+              <ValidationError prefix="Query" field="query" errors={state.errors} />
             </div>
 
             <button type="submit" className={styles.submitButton} disabled={state.submitting}>

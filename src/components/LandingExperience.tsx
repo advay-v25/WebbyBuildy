@@ -14,6 +14,7 @@ import styles from "@/app/page.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import ScrollScrubVideoDesktop from "@/components/ScrollScrubVideoDesktop";
 import ScrollScrubVideoTouch from "@/components/ScrollScrubVideoTouch";
+import { RegisterInterestModal } from "@/components/RegisterInterestModal";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -145,6 +146,7 @@ export default function LandingExperience() {
   const [hoveredCapability, setHoveredCapability] = useState<number | null>(null);
   const [activeFounder, setActiveFounder] = useState(0);
   const [activeSection, setActiveSection] = useState<"top" | "work" | "process" | "founders" | "contact">("top");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Touch/small-screen variant of the keyboard scatter (Phase 2).
 
@@ -934,14 +936,32 @@ export default function LandingExperience() {
 
         <section id="contact" data-cinematic-section className={styles.contactSection}>
           <div data-contact-arch className={styles.contactArch} aria-hidden="true" />
-          <div data-reveal>
+          <div data-reveal style={{ transform: "translateY(40px)" }}>
             <h2>Have something<br /><span>worth building</span></h2>
             <a href="mailto:studio@sitesmith.co.in" className={styles.email}>studio@sitesmith.co.in</a>
           </div>
-          <Link data-reveal data-magnetic href="/book" className={styles.bookButton}>Book a free call <ArrowUpRight size={21} /></Link>
+          <div className={styles.actionButtonsContainer}>
+            <Link data-reveal data-magnetic href="/book" className={styles.bookButton}>
+              Book a free call <ArrowUpRight size={21} style={{ flexShrink: 0 }} />
+            </Link>
+            <div className={styles.mono} style={{ width: "100%", textAlign: "center", color: "#000", fontSize: "1rem", letterSpacing: "0.1em", padding: "4px 0", fontWeight: 600 }}>
+              OR
+            </div>
+            <button data-reveal data-magnetic onClick={() => setIsModalOpen(true)} className={styles.bookButton} style={{ fontFamily: "inherit", cursor: "pointer", textAlign: "left", minHeight: "140px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxWidth: "85%" }}>
+                <span>Register your interest</span>
+                <span style={{ fontSize: "0.85rem", color: "#9d9790", fontWeight: "normal", lineHeight: 1.4, letterSpacing: "normal" }}>
+                  If you have a query or would like to discuss a project, we'd be happy to get in touch.
+                </span>
+              </div>
+              <ArrowUpRight size={21} style={{ flexShrink: 0 }} />
+            </button>
+          </div>
           <footer><span>Mumbai · India</span><span>SITESMITH © {new Date().getFullYear()}</span></footer>
         </section>
       </main>
+      
+      <RegisterInterestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
