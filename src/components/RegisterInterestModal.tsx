@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm, ValidationError } from "@formspree/react";
 import styles from "./RegisterInterestModal.module.css";
 import { X } from "lucide-react";
@@ -17,12 +16,12 @@ export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; on
         <div style={{ textAlign: "center" }}>
           <h2>Register Your Interest</h2>
           <p style={{ fontSize: "0.875rem", color: "#aaa", marginTop: "8px", lineHeight: 1.4, margin: "8px 0 0" }}>
-            If you have a query or would like to discuss a project, we'd be happy to get in touch.
+            If you have a query or would like to discuss a project, we&apos;d be happy to get in touch.
           </p>
         </div>
         {state.succeeded ? (
           <div className={styles.successMessage}>
-            <p>Thanks for registering! We'll get in touch with you shortly.</p>
+            <p>Thanks for registering! We&apos;ll get in touch with you shortly.</p>
             <button onClick={onClose} className={styles.submitButton}>Close</button>
           </div>
         ) : (

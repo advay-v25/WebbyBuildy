@@ -951,7 +951,7 @@ export default function LandingExperience() {
               <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxWidth: "85%" }}>
                 <span>Register your interest</span>
                 <span style={{ fontSize: "0.85rem", color: "#9d9790", fontWeight: "normal", lineHeight: 1.4, letterSpacing: "normal" }}>
-                  If you have a query or would like to discuss a project, we'd be happy to get in touch.
+                  If you have a query or would like to discuss a project, we&apos;d be happy to get in touch.
                 </span>
               </div>
               <ArrowUpRight size={21} style={{ flexShrink: 0 }} />
