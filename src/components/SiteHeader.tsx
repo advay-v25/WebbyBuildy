@@ -48,7 +48,12 @@ export function SiteHeader({ activeSection = "top" }: { activeSection?: Section 
         ) : (
           <Link data-active={false} href="/#founders" onClick={closeMenu}>Studio</Link>
         )}
-        <Link data-magnetic href="/book" className={styles.navCta} onClick={closeMenu}>
+        <Link 
+          data-magnetic 
+          href="/book"
+          className={styles.navCta} 
+          onClick={closeMenu}
+        >
           Start a project <ArrowUpRight size={15} />
         </Link>
       </nav>
