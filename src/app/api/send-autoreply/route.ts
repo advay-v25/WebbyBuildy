@@ -26,7 +26,7 @@ export async function POST(request: Request) {
           User_Name: name || 'there',
         }
       }
-    } as any); // Using 'as any' here because early versions of resend sdk had incomplete types for templateId
+    }); // Removed 'as any' to satisfy strict ESLint rules on Vercel
 
     if (error) {
       console.error('Resend error:', error);
