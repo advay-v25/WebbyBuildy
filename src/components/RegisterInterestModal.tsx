@@ -1,9 +1,32 @@
+"use client";
+import { useState, useEffect } from "react";
 import { useForm, ValidationError } from "@formspree/react";
 import styles from "./RegisterInterestModal.module.css";
 import { X } from "lucide-react";
 
 export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [state, handleSubmit] = useForm("mqpzpnzw");
+  const [submittedData, setSubmittedData] = useState<{name: string, email: string} | null>(null);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setSubmittedData({
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+    });
+    await handleSubmit(e);
+  };
+
+  useEffect(() => {
+    if (state.succeeded && submittedData) {
+      fetch("/api/send-autoreply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submittedData),
+      }).catch(err => console.error("Failed to trigger autoreply:", err));
+    }
+  }, [state.succeeded, submittedData]);
 
   if (!isOpen) return null;
 
@@ -25,7 +48,7 @@ export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; on
             <button onClick={onClose} className={styles.submitButton}>Close</button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className={styles.form}>
+          <form onSubmit={onSubmit} className={styles.form}>
             <div className={styles.formGroup}>
               <label htmlFor="name">Name</label>
               <input id="name" type="text" name="name" required placeholder="John Doe" />
