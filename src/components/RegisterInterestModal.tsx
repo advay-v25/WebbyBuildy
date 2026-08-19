@@ -20,6 +20,7 @@ export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; on
           lastSubmitDate.getMonth() === today.getMonth() &&
           lastSubmitDate.getFullYear() === today.getFullYear()
         ) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setHasSubmittedToday(true);
         }
       }
@@ -39,6 +40,7 @@ export function RegisterInterestModal({ isOpen, onClose }: { isOpen: boolean; on
   useEffect(() => {
     if (state.succeeded && submittedData) {
       localStorage.setItem("lastInterestSubmit", Date.now().toString());
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasSubmittedToday(true);
       fetch("/api/send-autoreply", {
         method: "POST",
