@@ -947,14 +947,8 @@ export default function LandingExperience() {
             <div className={styles.mono} style={{ width: "100%", textAlign: "center", color: "#000", fontSize: "1rem", letterSpacing: "0.1em", padding: "4px 0", fontWeight: 600 }}>
               OR
             </div>
-            <button data-reveal data-magnetic onClick={() => setIsModalOpen(true)} className={styles.bookButton} style={{ fontFamily: "inherit", cursor: "pointer", textAlign: "left", minHeight: "140px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxWidth: "85%" }}>
-                <span>Register your interest</span>
-                <span style={{ fontSize: "0.85rem", color: "#9d9790", fontWeight: "normal", lineHeight: 1.4, letterSpacing: "normal" }}>
-                  If you have a query or would like to discuss a project, we&apos;d be happy to get in touch.
-                </span>
-              </div>
-              <ArrowUpRight size={21} style={{ flexShrink: 0 }} />
+            <button data-reveal data-magnetic onClick={() => setIsModalOpen(true)} className={styles.bookButton} style={{ fontFamily: "inherit", cursor: "pointer", textAlign: "left" }}>
+              Register your interest <ArrowUpRight size={21} style={{ flexShrink: 0 }} />
             </button>
           </div>
           <footer><span>Mumbai · India</span><span>SITESMITH © {new Date().getFullYear()}</span></footer>
