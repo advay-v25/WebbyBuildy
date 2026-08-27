@@ -315,7 +315,6 @@ export default function LandingExperience() {
     const hash = window.location.hash;
     if (!hash || hash === "#top") return;
     let done = false;
-
     const goToHash = () => {
       if (done) return;
       const target = document.querySelector(hash);
@@ -328,8 +327,10 @@ export default function LandingExperience() {
       });
     };
 
-    const timer = window.setTimeout(goToHash, 400);
-    document.fonts.ready.then(goToHash).catch(() => undefined);
+    // On mobile, the ScrollScrubVideoTouch component takes longer to mount and setup
+    // its ScrollTrigger pins. If we trigger goToHash too early, the pin-spacer hasn't
+    // been created, resulting in an incorrect offset (landing in the middle of the process section).
+    const timer = window.setTimeout(goToHash, 1200);
     return () => window.clearTimeout(timer);
   }, [lenis]);
 
