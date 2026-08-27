@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import siteStyles from "@/app/page.module.css";
 import styles from "./team.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -79,17 +79,9 @@ const card = {
 };
 
 export default function TeamPage() {
-  const router = useRouter();
-
-  // Prefer returning to the exact page the user came from (the /studio
-  // "Three paths" page, where "Meet the studio" lives); fall back to /studio
-  // for direct/deep-link visits with no history to go back to.
-  const handleBack = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (window.history.length > 1) {
-      event.preventDefault();
-      router.back();
-    }
-  };
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
 
   return (
     <div className={siteStyles.site}>
@@ -118,7 +110,7 @@ export default function TeamPage() {
           animate="show"
         >
           <motion.div variants={rise}>
-            <Link href="/studio" onClick={handleBack} className={styles.backLink}>
+            <Link href="/#founders" className={styles.backLink}>
               <ArrowLeft size={15} /> Back to studio
             </Link>
           </motion.div>
