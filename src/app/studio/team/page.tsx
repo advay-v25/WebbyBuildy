@@ -23,21 +23,21 @@ const founders: Founder[] = [
   {
     first: "Aarav",
     last: "Aher",
-    discipline: "Business",
+    discipline: "International Business",
     role: "International Business at Northeastern",
     email: "aaravaher25@gmail.com",
     phone: "+91 98202 36834",
     bio: [
-      "I'm 19, studying International Business at Northeastern, and I tend to end up doing more than I was asked, whether that's turning a marketing brief into a distribution strategy or building an app because the tools I needed didn't exist.",
-      "I co-founded PlannrAI because I kept failing to plan my own days well, and it turns out most students have the same problem.",
-      "Football taught me most of what I know about reading a situation fast and making decisions without all the information, and I use that more than I expected.",
+      "I'm 19, from Mumbai, studying International Business at Northeastern with a concentration in Supply Chain and Data Analytics. I study in Boston during the year and spend my summers back in Mumbai.",
+      "Away from work you'll find me on a football pitch, watching F1, or playing a game of chess. Football gave me most of what I know about reading a situation quickly and making calls without all the information.",
+      "I like building things people actually use. PlannrAI started as a way to plan my own days, and it now has 50+ beta users.",
     ],
   },
   {
     first: "Abhimanyu",
     last: "Gupta",
     discipline: "Aviation",
-    role: "Cadet with IndiGo",
+    role: "Student Pilot",
     email: "abhimanyuwings12@gmail.com",
     phone: "+91 98205 20800",
     bio: [
