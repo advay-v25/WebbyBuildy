@@ -14,8 +14,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 gsap.registerPlugin(ScrollTrigger);
 
 const founders = [
-  ["Aarav", "Aher", "Business", "International Business at Northeastern"],
-  ["Abhimanyu", "Gupta", "Aviation", "Cadet with IndiGo"],
+  ["Aarav", "Aher", "International Business", "International Business at Northeastern"],
+  ["Abhimanyu", "Gupta", "Aviation", "Student Pilot"],
   ["Advay", "Vaidya", "Finance", "CFA aspirant"],
 ] as const;
 

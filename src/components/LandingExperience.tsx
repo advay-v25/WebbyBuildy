@@ -20,7 +20,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const founders = [
   ["Aarav", "Aher", "International Business at Northeastern"],
-  ["Abhimanyu", "Gupta", "Cadet with IndiGo"],
+  ["Abhimanyu", "Gupta", "Student Pilot"],
   ["Advay", "Vaidya", "CFA aspirant"],
 ] as const;
 
